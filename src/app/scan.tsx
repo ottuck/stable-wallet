@@ -1,6 +1,6 @@
 import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -21,6 +21,11 @@ export default function Scan() {
   const [message, setMessage] = useState<string | null>(null);
   // 같은 QR이 연달아 여러 번 인식되므로 한 번만 처리한다
   const handled = useRef(false);
+
+  // 처음 열면 바로 권한을 묻는다(거절한 적이 있으면 설정 안내 버튼만 보인다)
+  useEffect(() => {
+    if (permission && !permission.granted && permission.canAskAgain) void requestPermission();
+  }, [permission, requestPermission]);
 
   function onScanned({ data }: BarcodeScanningResult) {
     if (handled.current) return;

@@ -1,4 +1,3 @@
-import * as Clipboard from 'expo-clipboard';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { ActionSheetIOS, Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -8,25 +7,18 @@ import { activeNetworks } from '@/core/config/networks';
 import type { AssetBalance } from '@/core/evm/balances';
 import type { WalletTx } from '@/core/history';
 import { withSigner } from '@/core/keys/vault';
+import { CopyButton } from '@/features/copy-button';
 import { errorMessage } from '@/features/error-message';
 import { formatDate, openExplorer, shortAddress, shortHash } from '@/features/format';
 import { useRecentTxs } from '@/features/history/use-recent-txs';
 import { useBalances } from '@/features/home/use-balances';
-import {
-  ChevronDownIcon,
-  ClockIcon,
-  CopyIcon,
-  ReceiveIcon,
-  ScanIcon,
-  SendIcon,
-} from '@/features/icons';
+import { ChevronDownIcon, ClockIcon, ReceiveIcon, ScanIcon, SendIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import {
   Address,
   Button,
   Card,
   colors,
-  IconButton,
   Label,
   networkColor,
   Screen,
@@ -98,9 +90,7 @@ export default function Home() {
       <Card style={{ gap: 14 }}>
         <View style={styles.addressRow}>
           <Address value={address} short />
-          <IconButton label="주소 복사" onPress={() => void Clipboard.setStringAsync(address)}>
-            <CopyIcon size={18} color={colors.muted} />
-          </IconButton>
+          <CopyButton value={address} />
         </View>
         <View style={styles.actions}>
           <Action label="보내기" primary onPress={() => router.push('/send')}>

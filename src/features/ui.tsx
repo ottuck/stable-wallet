@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -61,13 +63,18 @@ export function Screen({
 }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+    // 숫자 키패드에는 닫기 키가 없어 하단 버튼이 키보드에 가린다 → 키보드만큼 올린다
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1, backgroundColor: colors.bg }}
+    >
       {/* 헤더가 반투명(iOS)이라 inset을 자동으로 맞춰 내용이 헤더 밑에 깔리지 않게 한다 */}
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.screen}
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         refreshControl={
           onRefresh ? <RefreshControl refreshing={false} onRefresh={onRefresh} /> : undefined
         }
@@ -79,7 +86,7 @@ export function Screen({
           {footer}
         </View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

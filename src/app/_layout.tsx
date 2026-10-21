@@ -24,8 +24,9 @@ const theme = {
 
 export default function RootLayout() {
   const status = useWallet((s) => s.status);
-  const [fontsLoaded] = useFonts({ IBMPlexMono_500Medium, IBMPlexMono_600SemiBold });
-  const ready = status !== 'loading' && fontsLoaded;
+  const [fontsLoaded, fontError] = useFonts({ IBMPlexMono_500Medium, IBMPlexMono_600SemiBold });
+  // 글꼴을 못 읽어도 시스템 글꼴로 연다(스플래시에 갇히지 않게)
+  const ready = status !== 'loading' && (fontsLoaded || fontError != null);
 
   useEffect(() => {
     void useWallet.getState().init();
