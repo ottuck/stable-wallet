@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { deriveWallet, generateMnemonic } from '@/core/keys/mnemonic';
+import { deriveAddress, generateMnemonic } from '@/core/keys/mnemonic';
 import { errorMessage } from '@/features/error-message';
 import { Button, Card, Label, Screen } from '@/features/ui';
 import { useSecretScreen } from '@/features/use-secret-screen';
@@ -10,7 +10,7 @@ import { useWallet } from '@/features/wallet/store';
 function createDraft() {
   const started = Date.now();
   const phrase = generateMnemonic();
-  const { address } = deriveWallet(phrase);
+  const address = deriveAddress(phrase);
   return { phrase, address, elapsedMs: Date.now() - started };
 }
 

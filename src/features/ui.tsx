@@ -41,7 +41,6 @@ export function Label({
   const c = useColors();
   return (
     <Text
-      selectable={mono}
       style={[{ color: muted ? c.muted : c.text, fontSize: 16 }, mono && styles.mono, style]}
       {...props}
     />
