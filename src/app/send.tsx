@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { formatUnits } from 'ethers';
 import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
@@ -35,7 +35,14 @@ export default function SendInput() {
   const balance = balances?.find((b) => b.tokenAddress === token?.address)?.raw ?? null;
 
   const [amountText, setAmountText] = useState('');
-  const [toText, setToText] = useState('');
+  const scan = useLocalSearchParams<{ to?: string; t?: string }>();
+  const [toText, setToText] = useState(scan.to ?? '');
+  // QR 스캔 화면이 돌려준 주소(t가 바뀔 때마다 새 스캔)를 받는 주소에 넣는다
+  const [scanSeen, setScanSeen] = useState(scan.t);
+  if (scan.t !== scanSeen) {
+    setScanSeen(scan.t);
+    setToText(scan.to ?? '');
+  }
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -165,7 +172,7 @@ export default function SendInput() {
           </Label>
           <View style={styles.toActions}>
             <TextButton title="붙여넣기" onPress={() => void paste()} />
-            <TextButton title="QR 스캔" disabled onPress={() => {}} />
+            <TextButton title="QR 스캔" onPress={() => router.push('/scan')} />
           </View>
         </View>
         <TextInput
