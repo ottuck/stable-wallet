@@ -3,12 +3,25 @@ import * as SQLite from 'expo-sqlite';
 // 비민감 데이터만 둔다. 복구 문구·키는 절대 넣지 않는다.
 let db: SQLite.SQLiteDatabase | null = null;
 
-function getDb(): SQLite.SQLiteDatabase {
+export function getDb(): SQLite.SQLiteDatabase {
   if (!db) {
     db = SQLite.openDatabaseSync('wallet.db');
-    db.execSync(
-      'PRAGMA journal_mode = WAL; CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);',
-    );
+    db.execSync(`
+      PRAGMA journal_mode = WAL;
+      CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS tx (
+        hash TEXT PRIMARY KEY,
+        networkId TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        decimals INTEGER NOT NULL,
+        fromAddress TEXT NOT NULL,
+        toAddress TEXT NOT NULL,
+        amount TEXT NOT NULL,
+        nonce INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        createdAt INTEGER NOT NULL
+      );
+    `);
   }
   return db;
 }
