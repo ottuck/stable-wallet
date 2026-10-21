@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { deriveWallet, generateMnemonic } from '@/core/keys/mnemonic';
@@ -16,22 +16,30 @@ function createDraft() {
 
 export default function Create() {
   const [draft, setDraft] = useState(createDraft);
+  // 저장 중에 찍힌 스크린샷도 알 수 있게 지금 보이는 문구를 ref로 따라간다
+  const currentDraft = useRef(draft);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // 스크린샷에 찍힌 문구는 쓰지 않는다
   useSecretScreen(() => {
-    setDraft(createDraft());
+    const next = createDraft();
+    currentDraft.current = next;
+    setDraft(next);
     setError(
       '스크린샷이 감지되어 복구 문구를 새로 만들었습니다. 사진 앱의 스크린샷도 지워 주세요.',
     );
   });
 
   async function confirm() {
+    const saving = draft;
     setBusy(true);
     setError(null);
     try {
-      await useWallet.getState().save(draft.phrase);
+      const saved = await useWallet
+        .getState()
+        .save(saving.phrase, () => currentDraft.current === saving);
+      if (!saved) setBusy(false);
     } catch (e) {
       setError(errorMessage(e));
       setBusy(false);
