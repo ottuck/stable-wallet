@@ -1,9 +1,9 @@
-import * as Clipboard from 'expo-clipboard';
 import { Share, StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 import { tokensOn } from '@/core/config/tokens';
-import { AlertIcon, CopyIcon, ShareIcon } from '@/features/icons';
+import { CopyButton } from '@/features/copy-button';
+import { AlertIcon, ShareIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import { Address, Card, colors, IconButton, Label, Screen, TokenIcon } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
@@ -41,13 +41,7 @@ export default function Receive() {
             <Address value={address} />
           </View>
           <View style={{ gap: 4 }}>
-            <IconButton
-              label="주소 복사"
-              filled
-              onPress={() => void Clipboard.setStringAsync(address)}
-            >
-              <CopyIcon size={18} />
-            </IconButton>
+            <CopyButton value={address} filled color={colors.text} />
             <IconButton
               label="주소 공유"
               filled
