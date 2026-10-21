@@ -22,6 +22,8 @@ export function parseAddressQr(text: string): { address: string; chainId?: numbe
   const [head, fn] = target.split('/');
   const [first, chain] = head.split('@');
   const chainId = chain ? Number(chain) : undefined;
+  // transfer 말고 다른 함수 호출(approve 등) URI는 받는 주소가 아니다
+  if (fn !== undefined && fn !== 'transfer') return null;
   const address = fn === 'transfer' ? (new URLSearchParams(query).get('address') ?? '') : first;
   if (!HEX_ADDRESS.test(address) || (chainId !== undefined && !Number.isInteger(chainId))) {
     return null;
