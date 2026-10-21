@@ -22,7 +22,7 @@
 | 상태      | Zustand                                          |                                                                       |
 | 검증      | Zod                                              | 외부 입력(QR, 주소, 금액) 경계에서만                                  |
 | QR        | react-native-qrcode-svg(생성), expo-camera(스캔) |                                                                       |
-| 인증      | expo-local-authentication                        | Face ID                                                               |
+| 인증      | expo-secure-store `requireAuthentication`        | Face ID. 별도 인증 라이브러리 없음                                    |
 | 테스트    | jest-expo                                        | 꼭 필요한 순수 로직만                                                 |
 
 `react-native-keychain` 대신 `expo-secure-store`를 쓴다: keychain 라이브러리는 2025-03 이후 릴리스가 없고, secure-store는 SDK와 같이 유지되며 필요한 옵션(this-device-only, 생체 인증)이 다 있다.

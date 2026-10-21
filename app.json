@@ -48,12 +48,6 @@
         }
       ],
       [
-        "expo-local-authentication",
-        {
-          "faceIDPermission": "Stable Wallet uses Face ID to unlock your recovery phrase before signing."
-        }
-      ],
-      [
         "expo-camera",
         {
           "cameraPermission": "Stable Wallet uses the camera only to scan wallet address QR codes.",
