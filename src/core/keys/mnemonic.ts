@@ -16,6 +16,11 @@ export function isValidMnemonic(phrase: string): boolean {
   return Mnemonic.isValidMnemonic(phrase);
 }
 
+/** 화면에는 주소만 넘긴다. 키를 가진 wallet 객체는 core/keys 밖으로 나가지 않는다. */
+export function deriveAddress(phrase: string): string {
+  return deriveWallet(phrase).address;
+}
+
 export function deriveWallet(phrase: string): HDNodeWallet {
   return HDNodeWallet.fromPhrase(phrase, undefined, DERIVATION_PATH);
 }

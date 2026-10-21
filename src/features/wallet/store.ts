@@ -13,7 +13,8 @@ type WalletState = {
   status: WalletStatus;
   address: string | null;
   init: () => Promise<void>;
-  save: (phrase: string) => Promise<void>;
+  /** 저장 중에 isStillValid가 false가 되면(예: 문구가 스크린샷에 찍힘) 저장한 것을 지우고 false를 돌려준다. */
+  save: (phrase: string, isStillValid?: () => boolean) => Promise<boolean>;
   keepFound: () => void;
   reset: () => Promise<void>;
 };
@@ -37,10 +38,15 @@ export const useWallet = create<WalletState>((set) => ({
     }
   },
 
-  async save(phrase) {
+  async save(phrase, isStillValid = () => true) {
     const address = await saveWallet(phrase);
+    if (!isStillValid()) {
+      await deleteWallet();
+      return false;
+    }
     markInstalled();
     set({ status: 'ready', address });
+    return true;
   },
 
   keepFound() {
