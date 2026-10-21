@@ -14,7 +14,7 @@ const HEADLINE = {
   pending: '블록 포함을 기다리는 중',
   confirmed: '보냈습니다',
   failed: '거래가 실패했습니다',
-  dropped: '거래가 취소됐습니다',
+  dropped: '전송되지 않았습니다',
 };
 
 export default function SendStatus() {
@@ -104,7 +104,9 @@ export default function SendStatus() {
           title="블록 포함 · receipt"
           detail={
             status === 'pending'
-              ? '보통 몇 초 걸려요. 앱을 닫아도 다음에 열 때 이어서 확인합니다.'
+              ? sent.uncertain
+                ? '전송 응답을 받지 못했어요. 네트워크에 올라갔는지 이어서 확인합니다. 다시 보내기 전에 홈에서 상태를 확인하세요.'
+                : '보통 몇 초 걸려요. 앱을 닫아도 다음에 열 때 이어서 확인합니다.'
               : status === 'confirmed'
                 ? 'status 1'
                 : 'status 0 · 토큰은 나가지 않았고 수수료만 냈습니다'

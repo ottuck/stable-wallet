@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { formatAmount } from '@/core/amount';
-import { hasGasBalance, hasTokenBalance, signAndBroadcast } from '@/core/evm/send';
-import { saveTx } from '@/core/history';
+import { WalletError } from '@/core/errors';
+import { broadcast, hasGasBalance, hasTokenBalance, signTransfer } from '@/core/evm/send';
+import { saveTx, updateTxStatus } from '@/core/history';
 import { withSigner } from '@/core/keys/vault';
 import { errorMessage } from '@/features/error-message';
 import { formatGwei, shortAddress } from '@/features/format';
@@ -56,9 +57,10 @@ export default function SendReview() {
     setBusy(true);
     setError(null);
     try {
-      const hash = await withSigner((signer) => signAndBroadcast(p, signer));
+      const signed = await withSigner((signer) => signTransfer(p, signer));
+      // 전송 전에 기록한다: 응답을 잃어도 홈의 pending 재확인으로 추적된다
       saveTx({
-        hash,
+        hash: signed.hash,
         networkId: p.network.id,
         symbol: p.token.symbol,
         decimals: p.token.decimals,
@@ -69,7 +71,17 @@ export default function SendReview() {
         status: 'pending',
         createdAt: Date.now(),
       });
-      useSendFlow.getState().setSent(hash);
+      const result = await broadcast(p.network, signed);
+      if (result === 'rejected') {
+        updateTxStatus(signed.hash, 'dropped');
+        throw new WalletError('BroadcastFailed');
+      }
+      // 이 확인 화면의 거래일 때만 상태 화면으로 넘긴다
+      if (useSendFlow.getState().preview !== p) {
+        setBusy(false);
+        return;
+      }
+      useSendFlow.getState().setSent(signed.hash, result === 'unknown');
       router.replace('/send-status');
     } catch (e) {
       setError(errorMessage(e));
@@ -96,7 +108,10 @@ export default function SendReview() {
         </>
       }
     >
-      <Stack.Screen options={{ title: '서명 전 확인' }} />
+      {/* 서명·전송 중에는 뒤로 갈 수 없다 */}
+      <Stack.Screen
+        options={{ title: '서명 전 확인', headerBackVisible: !busy, gestureEnabled: !busy }}
+      />
 
       <Card>
         <View style={styles.between}>

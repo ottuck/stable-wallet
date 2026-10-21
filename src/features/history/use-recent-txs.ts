@@ -23,7 +23,7 @@ export function useRecentTxs(network: NetworkConfig, address: string, refreshKey
     if (pending.length === 0) return;
     Promise.all(
       pending.map(async (tx) => {
-        const { status } = await checkReceipt(NETWORKS[tx.networkId], tx.hash);
+        const { status } = await checkReceipt(NETWORKS[tx.networkId], tx);
         if (status !== 'pending') updateTxStatus(tx.hash, status);
       }),
     ).then(() => active && setChecked((n) => n + 1));

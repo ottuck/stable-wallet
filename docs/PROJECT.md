@@ -116,8 +116,9 @@ submitted(pending) → confirmed | failed(revert)
                    → dropped (같은 nonce가 다른 tx로 확정됨)
 ```
 
-- 전송 직후 txHash와 함께 SQLite에 `pending`으로 저장하고 receipt를 기다린다.
-- 앱을 다시 켜면 `pending`인 tx의 receipt를 다시 확인한다.
+- 서명한 raw tx에서 hash를 계산해 **전송 전에** SQLite에 `pending`으로 저장한 뒤 전송한다. 노드가 거절하면(nonce·잔액·교체 가격) `dropped`, 응답을 못 받으면 `pending`으로 두고 나중에 가린다.
+- 홈을 열 때마다 `pending`인 tx를 다시 확인한다: receipt가 있으면 확정/실패, 노드도 모르는데 그 nonce가 이미 쓰였으면 `dropped`.
+- 서명·전송 중에는 확인 화면에서 뒤로 갈 수 없다.
 - 확인은 receipt 1개(`status === 1`)로 본다. speed-up/cancel은 하지 않는다.
 
 History 행: `hash, networkId, asset, from, to, amount(raw 문자열), status, createdAt`.

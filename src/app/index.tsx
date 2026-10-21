@@ -301,7 +301,7 @@ function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: ()
         </Label>
       ) : (
         <Label bold size={13} color={colors.danger}>
-          {tx.status === 'failed' ? '실패' : '취소됨'}
+          {tx.status === 'failed' ? '실패' : '전송 안 됨'}
         </Label>
       )}
     </Pressable>
