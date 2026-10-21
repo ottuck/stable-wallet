@@ -8,7 +8,7 @@
 
 ## 절대 규칙 (보안)
 
-- mnemonic·private key를 `core/keys` 밖으로 넘기지 않는다. 로그·에러 메시지·SQLite·AsyncStorage·클립보드·`.env`·Git에 남기지 않는다. `src`에서 `console.*` 금지(lint 에러).
+- mnemonic·private key를 `core/keys` 밖으로 넘기지 않는다(예외: 새 지갑의 복구 문구 표시 화면, 서명은 `withSigner` 콜백 안에서만). 로그·에러 메시지·SQLite·AsyncStorage·클립보드·`.env`·Git에 남기지 않는다. `src`에서 `console.*` 금지(lint 에러).
 - 토큰 금액은 `bigint`와 `parseUnits`/`formatUnits`로만 다룬다. `number`로 계산하지 않는다.
 - 암호 primitive를 직접 구현하지 않는다(ethers 사용).
 - 토큰·네트워크 주소는 공식 출처나 체인 조회로 확인하고 config에 출처를 남긴다. 기억으로 쓰지 않는다.
