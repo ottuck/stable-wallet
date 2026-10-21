@@ -124,6 +124,11 @@ submitted(pending) → confirmed | failed(revert)
 History 행: `hash, networkId, asset, from, to, amount(raw 문자열), status, createdAt`.
 들어온 tx는 잔액 변화와 explorer 링크로만 확인한다.
 
+## QR
+
+- 받기: 주소만 담은 QR(react-native-qrcode-svg) + 네트워크 경고 + 복사·공유.
+- 스캔(expo-camera): 주소만 있는 QR과 EIP-681(`ethereum:<주소>@<chainId>`)을 읽는다. ERC-20 결제 URI(`/transfer?address=`)는 앞의 토큰 컨트랙트가 아니라 `address` 파라미터를 받는 주소로 쓴다. chainId가 현재 네트워크와 다르면 거부. 읽은 주소는 보내기 화면에 넣기만 하고 검증은 `parseRecipient`가 한다.
+
 ## 에러
 
 `WalletError`의 `code`로 화면 문구를 고른다. raw RPC 에러는 화면에 보여주지 않는다(로그에도 tx 원문·키를 남기지 않는다).

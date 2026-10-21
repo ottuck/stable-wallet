@@ -49,6 +49,11 @@ export default function RootLayout() {
             name="send-status"
             options={{ headerShown: false, gestureEnabled: false }}
           />
+          <Stack.Screen name="receive" options={{ title: '받기' }} />
+          <Stack.Screen
+            name="scan"
+            options={{ headerShown: false, presentation: 'fullScreenModal' }}
+          />
         </Stack.Protected>
         <Stack.Protected guard={status === 'empty'}>
           <Stack.Screen name="welcome" options={{ title: 'Stable Wallet' }} />

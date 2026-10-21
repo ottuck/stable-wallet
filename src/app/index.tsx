@@ -106,10 +106,10 @@ export default function Home() {
           <Action label="보내기" primary onPress={() => router.push('/send')}>
             <SendIcon size={22} color="#FFFFFF" strokeWidth={2.2} />
           </Action>
-          <Action label="받기" disabled>
+          <Action label="받기" onPress={() => router.push('/receive')}>
             <ReceiveIcon size={22} color={colors.accentText} strokeWidth={2.2} />
           </Action>
-          <Action label="스캔" disabled>
+          <Action label="스캔" onPress={() => router.push('/scan?from=home')}>
             <ScanIcon size={22} color={colors.accentText} strokeWidth={2.2} />
           </Action>
         </View>
