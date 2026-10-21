@@ -9,7 +9,6 @@ import {
   View,
   type TextProps,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const LIGHT = { text: '#111', muted: '#666', bg: '#fff', card: '#f2f2f5', accent: '#208AEF' };
 const DARK = { text: '#f5f5f5', muted: '#9a9a9a', bg: '#000', card: '#1c1c1e', accent: '#4aa3ff' };
@@ -21,9 +20,15 @@ export function useColors() {
 export function Screen({ children }: { children: ReactNode }) {
   const c = useColors();
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.screen}>{children}</ScrollView>
-    </SafeAreaView>
+    // 헤더가 반투명(iOS)이라 inset을 자동으로 맞춰 내용이 헤더 밑에 깔리지 않게 한다
+    <ScrollView
+      style={{ flex: 1, backgroundColor: c.bg }}
+      contentContainerStyle={styles.screen}
+      contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
+    >
+      {children}
+    </ScrollView>
   );
 }
 

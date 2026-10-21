@@ -1,17 +1,20 @@
-import { usePreventScreenCapture } from 'expo-screen-capture';
 import { useState } from 'react';
 import { StyleSheet, TextInput } from 'react-native';
 
 import { errorMessage } from '@/features/error-message';
 import { Button, Label, Screen, useColors } from '@/features/ui';
+import { useSecretScreen } from '@/features/use-secret-screen';
 import { useWallet } from '@/features/wallet/store';
 
 export default function Import() {
-  usePreventScreenCapture();
   const c = useColors();
   const [phrase, setPhrase] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useSecretScreen(() =>
+    setError('스크린샷이 감지되었습니다. 복구 문구가 찍혔다면 사진 앱에서 지워 주세요.'),
+  );
 
   async function submit() {
     setBusy(true);

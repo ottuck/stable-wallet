@@ -1,10 +1,10 @@
-import { usePreventScreenCapture } from 'expo-screen-capture';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { deriveWallet, generateMnemonic } from '@/core/keys/mnemonic';
 import { errorMessage } from '@/features/error-message';
 import { Button, Card, Label, Screen } from '@/features/ui';
+import { useSecretScreen } from '@/features/use-secret-screen';
 import { useWallet } from '@/features/wallet/store';
 
 function createDraft() {
@@ -15,10 +15,17 @@ function createDraft() {
 }
 
 export default function Create() {
-  usePreventScreenCapture();
-  const [draft] = useState(createDraft);
+  const [draft, setDraft] = useState(createDraft);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 스크린샷에 찍힌 문구는 쓰지 않는다
+  useSecretScreen(() => {
+    setDraft(createDraft());
+    setError(
+      '스크린샷이 감지되어 복구 문구를 새로 만들었습니다. 사진 앱의 스크린샷도 지워 주세요.',
+    );
+  });
 
   async function confirm() {
     setBusy(true);

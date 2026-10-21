@@ -6,12 +6,13 @@ Phase 2까지가 1차 완성이다. Phase 3·4는 선택.
 
 ### PoC 1 — 키와 잔액
 
-- [ ] 개발용 빌드가 iPhone에서 뜬다
-- [ ] 지갑 생성 → 주소 표시 → secure-store 저장
-- [ ] 앱 재시작 → 같은 주소
+- [x] 개발용 빌드가 iPhone에서 뜬다
+- [x] 지갑 생성 → 주소 표시 → secure-store 저장
+- [x] 앱 재시작 → 같은 주소
 - [ ] 같은 mnemonic을 MetaMask에 import → 같은 주소
-- [ ] Amoy/Sepolia native 잔액 조회
-- [ ] 생성·파생 소요 시간 확인(느리면 `react-native-quick-crypto` 검토)
+- [x] Amoy/Sepolia native 잔액 조회
+- [x] 생성·파생 소요 시간 확인 — 생성 0.9초, Face ID 포함 서명 키 2.3초. 지금은 그대로 두고 송금 체감이 느리면 `react-native-quick-crypto` 검토
+- [ ] 복구 문구 화면 스크린샷 차단(iOS에서 찍힘 → 감지 시 문구 재생성으로 보완, 차단 여부 재확인)
 
 ### PoC 2 — ERC-20 전송
 
