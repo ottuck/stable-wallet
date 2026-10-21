@@ -190,9 +190,11 @@ const TOKEN_LOGOS: Record<string, number> = {
   USDC: require('@/assets/tokens/usdc.png'),
   POL: require('@/assets/tokens/pol.png'),
   ETH: require('@/assets/tokens/eth.png'),
+  // JPYC 공식 GitHub 조직(github.com/jpycoin) 프로필 이미지
+  JPYC: require('@/assets/tokens/jpyc.png'),
 };
 
-/** 로고가 없는 토큰(JPYC: 공식 로고 확인 전)은 점선 자리 표시. */
+/** 로고가 없는 토큰은 점선 자리 표시. */
 export function TokenIcon({ symbol, size = 36 }: { symbol: string; size?: number }) {
   const logo = TOKEN_LOGOS[symbol];
   const box = { width: size, height: size, borderRadius: size / 2 };
@@ -210,9 +212,7 @@ export function TokenIcon({ symbol, size = 36 }: { symbol: string; size?: number
       accessibilityLabel={symbol}
       style={[box, styles.tokenPlaceholder, { borderWidth: size > 24 ? 1.5 : 1 }]}
     >
-      <Text style={{ color: colors.muted, fontSize: size * 0.38 }}>
-        {symbol === 'JPYC' ? '¥' : '?'}
-      </Text>
+      <Text style={{ color: colors.muted, fontSize: size * 0.38 }}>?</Text>
     </View>
   );
 }

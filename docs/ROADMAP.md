@@ -25,7 +25,7 @@ Phase 2까지가 1차 완성이다. Phase 3·4는 선택.
 
 - [ ] Create(복구 문구 표시, 스크린샷 차단, 단어 확인) / Import
 - [ ] 재설치 규칙(PROJECT.md)
-- [ ] Balance(native + USDC + JPYC 테스트 토큰)
+- [ ] Balance(native + USDC + JPYC, 테스트넷 JPYC는 JPYC Faucet)
 - [ ] Send(검증·확인 화면·에러 문구)
 - [ ] Receive(주소, 복사, QR, 네트워크 경고)
 - [ ] QR 스캔 → 수신자 입력
@@ -42,7 +42,7 @@ Phase 2까지가 1차 완성이다. Phase 3·4는 선택.
 
 전환 전:
 
-- [ ] USDC(native)·JPYC 메인넷 주소를 공식 출처로 확인하고 config에 출처 기록
+- [x] USDC(native)·JPYC 메인넷 주소를 공식 출처로 확인하고 config에 출처 기록
 - [ ] 개발용 지갑은 새로 만든다(개인 메인 지갑과 분리), 복구 문구를 종이에 백업
 - [ ] 로그·SQLite에 secret이 없는지 확인
 - [ ] 거래소 출금 조건 확인(지원 네트워크, 최소 금액, 수수료, travel rule)
