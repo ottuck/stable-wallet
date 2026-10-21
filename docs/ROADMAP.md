@@ -16,8 +16,10 @@ Phase 2까지가 1차 완성이다. Phase 3·4는 선택.
 
 ### PoC 2 — ERC-20 전송
 
-- [ ] 테스트 USDC `balanceOf`
+- [ ] 테스트 USDC `balanceOf` (Amoy POL·USDC faucet 필요)
 - [ ] transfer 생성 → Face ID → 로컬 서명 → 전송 → receipt confirmed
+- [ ] 앱을 닫았다 열어도 pending 거래가 확정으로 바뀐다
+- [ ] 잔액·가스 부족이면 서명 버튼이 막힌다
 
 ### 기능 완성
 

@@ -42,6 +42,6 @@ pnpm dlx expo-doctor       # 의존성·설정 진단
 - `main`에 직접 push하지 않는다. 브랜치(`feat/…`, `fix/…`, `docs/…`, `chore/…`) → PR → CI 통과 → squash merge.
 - 커밋 메시지는 한국어 conventional commit(`feat: 지갑 생성 화면을 더한다`). 커밋은 리뷰 가능한 단위로 나눈다.
 - PR 라벨: 종류(`feat`/`fix`/`docs`/`chore`) + 단계(`phase-1`/`phase-2`), 키·서명·저장을 건드리면 `security`.
-- PR을 올리면 Codex(`chatgpt-codex-connector[bot]`)가 리뷰한다. CI와 함께 Codex 리뷰가 끝날 때까지 기다린 뒤 병합한다
-  (PR 요약 댓글의 `codex-review-state`가 `completed`). 지적은 코드를 직접 확인해 타당한 것만 같은 PR에 반영하고,
-  반영하지 않는 지적은 해당 리뷰 스레드에 이유를 한 줄 답한다. 리뷰가 멈춰 있으면 `@codex review` 댓글로 다시 요청한다.
+- PR을 올리면 Codex(`chatgpt-codex-connector[bot]`)가 리뷰한다. **리뷰는 선택이다**: CI가 통과하면 병합하고, Codex 리뷰를
+  따로 오래 기다리지 않는다. CI가 끝날 때 와 있는 지적은 코드를 직접 확인해 타당한 것만 같은 PR에 반영하고, 반영하지 않는
+  지적은 해당 리뷰 스레드에 이유를 한 줄 답한다. 병합 뒤에 온 지적은 다음 PR에서 같은 기준으로 처리한다.

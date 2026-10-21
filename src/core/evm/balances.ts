@@ -31,6 +31,21 @@ export function getProvider(network: NetworkConfig): JsonRpcProvider {
   return provider;
 }
 
+// ERC-20 transfer 한 번의 대략적인 가스 사용량(홈의 "전송 약 N회" 표시용)
+const TYPICAL_TRANSFER_GAS = 65_000n;
+
+/** 지금 수수료로 ERC-20 전송 한 번에 드는 대략적인 native 금액. */
+export async function estimateTransferFee(network: NetworkConfig): Promise<bigint> {
+  try {
+    const fee = await getProvider(network).getFeeData();
+    const price = fee.maxFeePerGas ?? fee.gasPrice;
+    if (price == null) throw new Error('no fee data');
+    return price * TYPICAL_TRANSFER_GAS;
+  } catch (cause) {
+    throw new WalletError('RpcUnavailable', { cause });
+  }
+}
+
 export async function getBalances(network: NetworkConfig, owner: string): Promise<AssetBalance[]> {
   const provider = getProvider(network);
   const tokens = tokensOn(network.id);
