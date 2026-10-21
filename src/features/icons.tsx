@@ -40,12 +40,6 @@ export const ReceiveIcon = icon(() => <Path d="M17 7L7 17M16 17H7V8" />);
 export const ScanIcon = icon(() => (
   <Path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16" />
 ));
-export const PasteIcon = icon(() => (
-  <>
-    <Rect x={8} y={3} width={8} height={4} rx={1} />
-    <Path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-  </>
-));
 export const CheckIcon = icon(() => <Path d="M5 12l5 5 9-10" />);
 export const CrossIcon = icon(() => <Path d="M6 6l12 12M18 6L6 18" />);
 export const ClockIcon = icon(() => (

@@ -133,7 +133,7 @@ History 행: `hash, networkId, asset, from, to, amount(raw 문자열), status, c
 
 ## UI
 
-D안 "투명한 거래"(디자인 캔버스: claude.ai/artifact/N8kxDH1edd99Y2QP3v2TwN). 밝은 테마 하나, 흰 카드 + 회색 바탕, 강조색 `#2F5BEA`, 숫자·주소·tx 값은 IBM Plex Mono. 칩(배지) 대신 아이콘+글자, 보조 동작은 아이콘 버튼. 토큰 로고는 Trust Wallet assets(MIT)에서 받은 `assets/tokens/`, JPYC는 공식 로고 확인 전까지 점선 자리 표시. 토큰은 `src/features/ui.tsx`.
+D안 "투명한 거래"(디자인 캔버스: claude.ai/artifact/N8kxDH1edd99Y2QP3v2TwN). 밝은 테마 하나, 흰 카드 + 회색 바탕, 강조색 `#2F5BEA`, 숫자·주소·tx 값은 IBM Plex Mono. 칩(배지) 대신 아이콘+글자. 뜻이 분명한 보조 동작(복사·공유)은 아이콘 버튼, 헷갈릴 수 있는 것(붙여넣기·QR 스캔)은 글자 버튼. 토큰 로고는 Trust Wallet assets(MIT)에서 받은 `assets/tokens/`, JPYC는 공식 로고 확인 전까지 점선 자리 표시. 토큰은 `src/features/ui.tsx`.
 
 ## 테스트
 
