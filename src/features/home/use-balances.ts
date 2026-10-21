@@ -17,7 +17,9 @@ export function useBalances(network: NetworkConfig, address: string) {
 
   useEffect(() => {
     let active = true;
-    Promise.all([getBalances(network, address), estimateTransferFee(network)]).then(
+    // 수수료 추정은 "전송 약 N회" 표시용이라 실패해도 잔액은 보여준다
+    const transferFee = estimateTransferFee(network).catch(() => null);
+    Promise.all([getBalances(network, address), transferFee]).then(
       ([balances, transferFee]) => active && setResult({ key, balances, transferFee, error: null }),
       (error: unknown) => active && setResult({ key, balances: null, transferFee: null, error }),
     );
