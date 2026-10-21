@@ -40,5 +40,8 @@ describe('parseAddressQr', () => {
   it('주소가 아닌 QR은 null', () => {
     expect(parseAddressQr('https://example.com')).toBeNull();
     expect(parseAddressQr(`${ADDRESS} 메모`)).toBeNull();
+    expect(
+      parseAddressQr(`ethereum:${USDC}@80002/approve?address=${ADDRESS}&uint256=1`),
+    ).toBeNull();
   });
 });
