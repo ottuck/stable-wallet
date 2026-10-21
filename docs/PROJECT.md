@@ -38,6 +38,8 @@
 - 의존성은 정확한 버전으로 고정하고 lockfile을 커밋한다. 서명·키 경로에는 새 패키지를 들이지 않는다.
 - Face ID 등록 정보가 바뀌면 iOS가 항목을 무효화할 수 있다 → 그때는 mnemonic으로 복원한다(백업이 유일한 복구 수단).
 
+백업은 복구 문구(종이)만 쓴다. 암호화 클라우드 백업·패스키 스마트 계정·MPC는 MetaMask 호환과 "니모닉 → 키 → 서명" 학습 흐름을 바꾸거나 외부 서버가 필요해 하지 않는다.
+
 MetaMask와의 차이: MetaMask는 앱 비밀번호로 암호화한 vault를 저장하고 그 비밀번호를 Keychain에 둔다(2중). 이 앱은 단일 기기 개인용이라 앱 비밀번호 없이 OS Keychain + Face ID에 맡긴다. 접근 옵션(this-device-only, 생체/기기 암호)과 스크린샷 차단은 MetaMask와 같다.
 
 ### 재설치 규칙
@@ -102,7 +104,7 @@ type TokenConfig = {
 - 토큰 잔액, native 가스 잔액(가스 부족이면 서명 전에 차단)
 - 체인: provider의 chainId가 config와 다르면 `NetworkMismatch`
 
-수수료: EIP-1559, `provider.getFeeData()` + `estimateGas`에 20% 여유. 값을 하드코딩하지 않는다.
+수수료: EIP-1559. priority fee는 노드의 `eth_maxPriorityFeePerGas`, `maxFeePerGas = baseFee × 2 + priority`, `gasLimit = estimateGas × 1.2`. 값을 하드코딩하지 않는다. 확인 화면에는 서명할 값(to, data, nonce, gasLimit, maxFee, tip, 예상·최대 수수료)을 그대로 보여준다.
 Nonce: `getTransactionCount(address, 'pending')`.
 
 ### Tx 상태
@@ -127,6 +129,10 @@ History 행: `hash, networkId, asset, from, to, amount(raw 문자열), status, c
 
 `InvalidAddress`, `InvalidAmount`, `InsufficientTokenBalance`, `InsufficientGasBalance`, `RpcUnavailable`,
 `GasEstimationFailed`, `SigningFailed`, `BroadcastFailed`, `TransactionReverted`, `NetworkMismatch`, `UnsupportedAsset`, `AuthCancelled`
+
+## UI
+
+D안 "투명한 거래"(디자인 캔버스: claude.ai/artifact/N8kxDH1edd99Y2QP3v2TwN). 밝은 테마 하나, 흰 카드 + 회색 바탕, 강조색 `#2F5BEA`, 숫자·주소·tx 값은 IBM Plex Mono. 칩(배지) 대신 아이콘+글자, 보조 동작은 아이콘 버튼. 토큰 로고는 Trust Wallet assets(MIT)에서 받은 `assets/tokens/`, JPYC는 공식 로고 확인 전까지 점선 자리 표시. 토큰은 `src/features/ui.tsx`.
 
 ## 테스트
 
