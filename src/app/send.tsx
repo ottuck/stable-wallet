@@ -11,10 +11,10 @@ import { prepareSend } from '@/core/evm/send';
 import { hasSentTo } from '@/core/history';
 import { errorMessage } from '@/features/error-message';
 import { useBalances } from '@/features/home/use-balances';
-import { AlertIcon, CheckIcon, PasteIcon, ScanIcon } from '@/features/icons';
+import { AlertIcon, CheckIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import { useSendFlow } from '@/features/send/store';
-import { Button, Card, colors, fonts, IconButton, Label, Screen, TokenIcon } from '@/features/ui';
+import { Button, Card, colors, fonts, Label, Screen, TokenIcon } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
 function tryParse<T>(fn: () => T): T | null {
@@ -159,29 +159,27 @@ export default function SendInput() {
       </Card>
 
       <Card>
-        <Label muted size={12}>
-          받는 주소
-        </Label>
-        <View style={styles.toRow}>
-          <TextInput
-            accessibilityLabel="받는 주소"
-            value={toText}
-            onChangeText={setToText}
-            placeholder="0x…"
-            placeholderTextColor={colors.placeholder}
-            autoCapitalize="none"
-            autoCorrect={false}
-            spellCheck={false}
-            multiline
-            style={styles.toInput}
-          />
-          <IconButton label="붙여넣기" filled onPress={() => void paste()}>
-            <PasteIcon size={18} />
-          </IconButton>
-          <IconButton label="QR 스캔(준비 중)" filled disabled onPress={() => {}}>
-            <ScanIcon size={18} color={colors.placeholder} />
-          </IconButton>
+        <View style={styles.toHeader}>
+          <Label muted size={12}>
+            받는 주소
+          </Label>
+          <View style={styles.toActions}>
+            <TextButton title="붙여넣기" onPress={() => void paste()} />
+            <TextButton title="QR 스캔" disabled onPress={() => {}} />
+          </View>
         </View>
+        <TextInput
+          accessibilityLabel="받는 주소"
+          value={toText}
+          onChangeText={setToText}
+          placeholder="0x…"
+          placeholderTextColor={colors.placeholder}
+          autoCapitalize="none"
+          autoCorrect={false}
+          spellCheck={false}
+          multiline
+          style={styles.toInput}
+        />
         {toText !== '' && (
           <View style={styles.checks}>
             {to === null ? (
@@ -210,6 +208,32 @@ export default function SendInput() {
 
       {error && <Label color={colors.danger}>{error}</Label>}
     </Screen>
+  );
+}
+
+/** 보조 동작은 아이콘 대신 글자로(뜻이 바로 읽히게). disabled는 아직 준비 중인 기능. */
+function TextButton({
+  title,
+  onPress,
+  disabled,
+}: {
+  title: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      hitSlop={10}
+      style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+    >
+      <Label bold size={13} color={disabled ? colors.placeholder : colors.accent}>
+        {title}
+      </Label>
+    </Pressable>
   );
 }
 
@@ -259,14 +283,15 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   balanceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  toRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  toHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  toActions: { flexDirection: 'row', gap: 18 },
   toInput: {
-    flex: 1,
-    minWidth: 0,
+    minHeight: 44,
     fontFamily: fonts.mono,
-    fontSize: 13,
+    fontSize: 14,
     color: colors.text,
     padding: 0,
+    textAlignVertical: 'center',
   },
   checks: {
     borderTopWidth: 1,
