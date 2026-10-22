@@ -77,7 +77,7 @@ demo/               # 전시용 웹 데모(pnpm demo). 가짜 데이터와 가�
 - 체인 코드는 `core/evm`에만 둔다. Bitcoin을 하게 되면 `core/btc`를 같은 모양(잔액·수수료·전송·주소 검증)으로 더하고, 지금은 공통 인터페이스를 미리 만들지 않는다.
 - History는 `core/history` 함수로만 접근한다(나중에 동기화를 붙이더라도 지갑 로직은 모른다).
 - 데모: `pnpm demo`는 `demo/overrides.js` 목록에 있는 곳만 `demo/stubs`로 바꿔 웹에서 연다. 앱 바깥과 닿는 경계(`core/db`, `core/history`, `core/keys/vault`, `core/evm/provider`, 웹에 없는 스크린샷 차단 `features/use-secret-screen`)와, 공개 웹 데모에서 막아야 하는 것들이다: 새 지갑 문구는 무작위가 아니라 공개된 예시 문구(`core/keys/mnemonic`), 가져오기는 입력란 대신 예시 문구(가져오기 화면의 `TextInput`), 카메라는 켜지 않고 가짜 뷰파인더와 "예시 QR 읽기"(`expo-camera`), 클립보드는 읽지도 쓰지도 않음(붙여넣기는 예시 받는 주소, 복사는 안내 — `expo-clipboard`), 받기 QR은 주소가 아닌 안내 글에 가운데를 덮어 일부러 읽히지 않게(`react-native-qrcode-svg`), 받기 공유는 안내(받기 화면의 `Share`), 가짜 거래의 탐색기 링크는 안내(토큰 컨트랙트 링크는 실제로 연다 — `features/format`의 `openExplorer`). 화면 위에는 늘 DEMO 띠가 있고, 서명할 때 Face ID 장면을 보여준다(`demo/overlay.tsx`). 데모에만 나오는 문구는 `demo/text.ts`에 둔다. 수수료 계산·서명·전송 로직은 실제 코드가 그대로 돈다. `src`는 `demo`를 import하지 않고, 가짜 값은 `demo/data.ts`에만 둔다. 바꾼 파일의 export가 바뀌면 stub도 같이 고친다(stub이 실제 함수 타입을 따라 typecheck가 알려준다). 주소창 `?state=empty|found|error`로 시작 화면을 고른다. 키는 페이지 메모리에만 있고, 문구가 고정이라 새로고침해도 같은 주소다.
-- 공개 데모: `pnpm demo:build`가 같은 데모를 정적 파일(`dist/`)로 만든다. 정적 호스팅에 올려 `wallet.portfolio-hub.dev`로 내보내고, 없는 경로는 `index.html`로 보낸다.
+- 공개 데모: `pnpm demo:build`가 같은 데모를 정적 파일(`dist/`)로 만든다. 공개 빌드는 `?state=`를 무시하고 늘 지갑이 있는 홈에서 시작한다(지갑 만들기·가져오기는 보이지 않는다). 정적 호스팅에 올려 `wallet.portfolio-hub.dev`로 내보내고, 없는 경로는 `index.html`로 보낸다.
 
 ### Config
 
