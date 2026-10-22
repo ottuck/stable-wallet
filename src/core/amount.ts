@@ -15,6 +15,27 @@ export function parseAmount(input: string, decimals: number): bigint {
   return raw;
 }
 
+export type AmountKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '.' | 'back';
+
+/** 정수 부분은 이 자리수까지만 받는다(화면에 다 보이게) */
+const MAX_WHOLE_DIGITS = 12;
+
+/**
+ * 숫자 키패드 입력을 금액 문자열에 반영한다. 받을 수 없는 키(두 번째 소수점, decimals 초과 등)는 그대로 돌려준다.
+ * 결과는 `0.` 처럼 입력 중인 모양일 수 있어, 값으로 쓰기 전에 parseAmount로 확인한다.
+ */
+export function applyAmountKey(current: string, key: AmountKey, decimals: number): string {
+  if (key === 'back') return current.slice(0, -1);
+  if (key === '.') {
+    if (decimals === 0 || current.includes('.')) return current;
+    return current === '' ? '0.' : `${current}.`;
+  }
+  const [whole, fraction] = current.split('.');
+  if (fraction !== undefined) return fraction.length >= decimals ? current : current + key;
+  if (whole === '0') return key;
+  return whole.length >= MAX_WHOLE_DIGITS ? current : current + key;
+}
+
 /** 표시용. 소수점 아래는 maxFraction 자리에서 버린다(반올림하지 않는다). */
 export function formatAmount(raw: bigint, decimals: number, maxFraction = 6): string {
   const [whole, fraction = ''] = formatUnits(raw, decimals).split('.');
