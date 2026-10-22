@@ -48,6 +48,11 @@ export function listTxs(fromAddress: string, networkId: NetworkId, limit = 20): 
   );
 }
 
+/** 거래 하나(상세 화면). 없으면 null */
+export function getTx(hash: string): WalletTx | null {
+  return getDb().getFirstSync<WalletTx>('SELECT * FROM tx WHERE hash = ?', hash);
+}
+
 /** 이 주소로 보낸 적이 있는지(처음 보내는 주소 경고용) */
 export function hasSentTo(fromAddress: string, toAddress: string): boolean {
   return (

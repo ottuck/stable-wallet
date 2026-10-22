@@ -53,6 +53,8 @@ export const listTxs: typeof Real.listTxs = (fromAddress, networkId, limit = 20)
     .slice(0, limit);
 };
 
+export const getTx: typeof Real.getTx = (hash) => txs.find((t) => t.hash === hash) ?? null;
+
 export const hasSentTo: typeof Real.hasSentTo = (fromAddress, toAddress) =>
   txs.some(
     (t) => t.fromAddress === fromAddress && t.toAddress.toLowerCase() === toAddress.toLowerCase(),
