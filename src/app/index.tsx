@@ -139,7 +139,7 @@ export default function Home() {
               key={tx.hash}
               tx={tx}
               last={i === txs.length - 1}
-              onPress={() => openExplorer(network, `tx/${tx.hash}`)}
+              onPress={() => router.push({ pathname: '/tx', params: { hash: tx.hash } })}
             />
           ))
         )}
