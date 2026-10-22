@@ -48,7 +48,7 @@ iOS Keychain은 앱을 지워도 남고 SQLite는 지워진다. SQLite가 새로
 
 ## 언어
 
-한국어·영어를 지원한다. 화면에 보이는 문구는 모두 `features/i18n/messages.ts`에 있다: `ko`가 기준이고 `en`은 같은 모양이어야 한다(빠뜨리면 typecheck가 알려준다). 컴포넌트는 `useT()`, 이벤트 핸들러는 `currentMessages()`로 읽는다. `core`에는 문구를 두지 않고 에러는 `WalletError`의 `code`로 `messages.errors`에서 고른다. 언어는 자동(기기 언어가 한국어면 한국어, 그 밖에는 영어) · 한국어 · English 중 고르며, 선택은 SQLite `meta`에 저장한다(홈 아래쪽과 환영 화면에서 바꾼다). 토큰 금액·주소·hash 표기는 언어와 무관하다.
+한국어·영어를 지원한다. 화면에 보이는 문구는 모두 `features/i18n/messages.ts`에 있다: `ko`가 기준이고 `en`은 같은 모양이어야 한다(빠뜨리면 typecheck가 알려준다). 컴포넌트는 `useT()`, 이벤트 핸들러는 `currentMessages()`로 읽는다. `core`에는 문구를 두지 않고 에러는 `WalletError`의 `code`로 `messages.errors`에서 고른다. 처음에는 기기 언어를 따른다(한국어면 한국어, 그 밖에는 영어). 홈과 환영 화면 맨 위의 작은 KO · EN 선택으로 바꾸며, 고른 언어는 SQLite `meta`에 저장한다. 토큰 금액·주소·hash 표기는 언어와 무관하다.
 
 ## 구조
 

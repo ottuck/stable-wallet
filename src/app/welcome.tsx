@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { HenryMark } from '@/features/brand';
 import { useT } from '@/features/i18n';
-import { LanguagePicker } from '@/features/i18n/language-picker';
+import { LanguageSwitch } from '@/features/i18n/language-switch';
 import { EyeIcon, FaceIdIcon, ShieldIcon } from '@/features/icons';
 import { Button, Card, Label, Screen, useColors, useThemed, type Palette } from '@/features/ui';
 
@@ -21,7 +21,9 @@ export default function Welcome() {
     >
       <Stack.Screen options={{ headerShown: false }} />
 
-      <LanguagePicker />
+      <View style={styles.top}>
+        <LanguageSwitch />
+      </View>
 
       <View style={styles.hero}>
         <HenryMark size={96} />
@@ -72,6 +74,7 @@ function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; 
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
+    top: { alignItems: 'flex-end' },
     hero: { alignItems: 'center', gap: 10, paddingTop: 20, paddingBottom: 16 },
     tagline: { textAlign: 'center', lineHeight: 22, maxWidth: 280 },
     feature: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },

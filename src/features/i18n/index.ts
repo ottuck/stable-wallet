@@ -46,8 +46,17 @@ export const useLanguage = create<{
   },
 }));
 
+function resolveLocale(pref: LanguagePref): Locale {
+  return pref === 'auto' ? deviceLocale() : pref;
+}
+
 function messagesFor(pref: LanguagePref): Messages {
-  return catalogs[pref === 'auto' ? deviceLocale() : pref];
+  return catalogs[resolveLocale(pref)];
+}
+
+/** 지금 쓰는 언어(자동이면 기기 언어로 정해진 값). */
+export function useLocale(): Locale {
+  return resolveLocale(useLanguage((s) => s.pref));
 }
 
 /** 화면에서 쓰는 문구. 언어를 바꾸면 다시 그려진다. */
