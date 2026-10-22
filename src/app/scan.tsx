@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { parseAddressQr } from '@/core/address';
 import { CrossIcon } from '@/features/icons';
+import { useT } from '@/features/i18n';
 import { useNetwork } from '@/features/network-store';
 import { Button, Label, type Palette, useThemed } from '@/features/ui';
 
@@ -14,6 +15,7 @@ import { Button, Label, type Palette, useThemed } from '@/features/ui';
  * from=home이면 보내기 화면을 새로 열고, 아니면 열려 있던 보내기 화면으로 돌아간다.
  */
 export default function Scan() {
+  const t = useT();
   const styles = useThemed(makeStyles);
   const { from } = useLocalSearchParams<{ from?: string }>();
   const network = useNetwork((s) => s.network);
@@ -36,13 +38,11 @@ export default function Scan() {
     if (handled.current) return;
     const parsed = parseAddressQr(data);
     if (!parsed) {
-      setMessage('지갑 주소 QR이 아닙니다.');
+      setMessage(t.scan.notAddress);
       return;
     }
     if (parsed.chainId !== undefined && parsed.chainId !== network.chainId) {
-      setMessage(
-        `다른 네트워크(chainId ${parsed.chainId})용 QR입니다. 지금은 ${network.name}입니다.`,
-      );
+      setMessage(t.scan.otherNetwork(parsed.chainId, network.name));
       return;
     }
     handled.current = true;
@@ -66,12 +66,12 @@ export default function Scan() {
       ) : (
         <View style={[styles.center, { padding: 32, gap: 16 }]}>
           <Label color="#FFFFFF" style={{ textAlign: 'center', lineHeight: 22 }}>
-            주소 QR을 읽으려면 카메라 권한이 필요합니다.
+            {t.scan.needCamera}
           </Label>
           {permission && !permission.canAskAgain ? (
-            <Button title="설정에서 허용" onPress={() => void Linking.openSettings()} />
+            <Button title={t.scan.openSettings} onPress={() => void Linking.openSettings()} />
           ) : (
-            <Button title="카메라 허용" onPress={() => void requestPermission()} />
+            <Button title={t.scan.allowCamera} onPress={() => void requestPermission()} />
           )}
         </View>
       )}
@@ -85,7 +85,7 @@ export default function Scan() {
       <View style={[styles.top, { paddingTop: insets.top + 8 }]}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="닫기"
+          accessibilityLabel={t.common.close}
           onPress={() => router.back()}
           style={styles.close}
         >
@@ -95,10 +95,10 @@ export default function Scan() {
 
       <View style={[styles.bottom, { paddingBottom: insets.bottom + 24 }]}>
         <Label bold color="#FFFFFF" style={{ textAlign: 'center' }}>
-          받는 사람의 주소 QR을 비춰 주세요
+          {t.scan.aim}
         </Label>
         <Label size={13} color={message ? '#FFB4A9' : '#C9CCD3'} style={{ textAlign: 'center' }}>
-          {message ?? `${network.name} 주소만 받습니다`}
+          {message ?? t.scan.onlyAddresses(network.name)}
         </Label>
       </View>
     </View>

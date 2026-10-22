@@ -6,6 +6,7 @@ import { formatAmount } from '@/core/amount';
 import { hasGasBalance, hasTokenBalance } from '@/core/evm/send';
 import { submitTransfer } from '@/core/transfer';
 import { errorMessage } from '@/features/error-message';
+import { useT } from '@/features/i18n';
 import { formatGwei, shortAddress } from '@/features/format';
 import { AlertIcon, CheckIcon, ChevronDownIcon, FaceIdIcon } from '@/features/icons';
 import { useSendFlow } from '@/features/send/store';
@@ -24,6 +25,7 @@ import {
 
 export default function SendReview() {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   const p = useSendFlow((s) => s.preview);
   const [busy, setBusy] = useState(false);
@@ -36,22 +38,22 @@ export default function SendReview() {
   const gasOk = hasGasBalance(p);
   const checks: { label: string; ok: boolean; detail?: string }[] = [
     // 입력 화면에서 parseRecipient를 통과한 주소만 여기에 온다
-    { label: '주소 형식·체크섬', ok: true },
-    { label: '토큰 컨트랙트로 보내지 않음', ok: true },
+    { label: t.review.addressFormat, ok: true },
+    { label: t.review.notContract, ok: true },
     {
-      label: `${p.token.symbol} 잔액`,
+      label: t.review.balanceCheck(p.token.symbol),
       ok: tokenOk,
       detail: `${formatAmount(p.tokenBalance, p.token.decimals)} ≥ ${formatAmount(p.amount, p.token.decimals)}`,
     },
     {
-      label: `가스 ${native.symbol}`,
+      label: t.review.gasCheck(native.symbol),
       ok: gasOk,
       detail:
         p.maxFee === null
-          ? '계산 안 됨'
+          ? t.review.notComputed
           : `${formatAmount(p.nativeBalance, native.decimals, 4)} ≥ ${formatAmount(p.maxFee, native.decimals, 4)}`,
     },
-    { label: '네트워크(체인 ID)', ok: true, detail: String(p.network.chainId) },
+    { label: t.review.network, ok: true, detail: String(p.network.chainId) },
   ];
   const passed = checks.filter((check) => check.ok).length;
 
@@ -84,7 +86,7 @@ export default function SendReview() {
             </Label>
           )}
           <Button
-            title="Face ID로 서명하고 보내기"
+            title={t.review.sign}
             icon={<FaceIdIcon size={20} color={c.onPrimary} />}
             busy={busy}
             disabled={!tokenOk || !gasOk}
@@ -95,7 +97,7 @@ export default function SendReview() {
     >
       {/* 서명·전송 중에는 뒤로 갈 수 없다 */}
       <Stack.Screen
-        options={{ title: '서명 전 확인', headerBackVisible: !busy, gestureEnabled: !busy }}
+        options={{ title: t.nav.review, headerBackVisible: !busy, gestureEnabled: !busy }}
       />
 
       <Card>
@@ -117,8 +119,8 @@ export default function SendReview() {
           </View>
         </View>
         {[
-          ['보냄', p.from],
-          ['받음', p.to],
+          [t.review.from, p.from],
+          [t.review.to, p.to],
         ].map(([label, value]) => (
           <View key={label} style={styles.party}>
             <Label muted size={12} style={styles.partyLabel}>
@@ -133,7 +135,7 @@ export default function SendReview() {
 
       <Card style={{ gap: 9 }}>
         <Label bold muted size={12}>
-          {`검증 ${passed}/${checks.length}`}
+          {t.review.checks(passed, checks.length)}
         </Label>
         {checks.map((check) => (
           <View key={check.label} style={styles.between}>
@@ -158,10 +160,10 @@ export default function SendReview() {
 
       <Card style={{ gap: 10 }}>
         <Label bold muted size={12}>
-          수수료
+          {t.review.fees}
         </Label>
         <View style={styles.between}>
-          <Label size={13}>예상</Label>
+          <Label size={13}>{t.review.estimated}</Label>
           <Label mono size={13}>
             {p.estimatedFee === null
               ? '—'
@@ -169,7 +171,7 @@ export default function SendReview() {
           </Label>
         </View>
         <View style={styles.between}>
-          <Label size={13}>최대</Label>
+          <Label size={13}>{t.review.maximum}</Label>
           <Label mono size={13}>
             {p.maxFee === null
               ? '—'
@@ -187,7 +189,7 @@ export default function SendReview() {
           style={styles.between}
         >
           <Label bold muted size={12}>
-            서명할 트랜잭션 상세 (EIP-1559)
+            {t.review.details}
           </Label>
           <View style={{ transform: [{ rotate: showRaw ? '180deg' : '0deg' }] }}>
             <ChevronDownIcon size={16} color={c.muted} />

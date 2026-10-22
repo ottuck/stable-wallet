@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { deriveAddress, generateMnemonic } from '@/core/keys/mnemonic';
 import { errorMessage } from '@/features/error-message';
+import { useT } from '@/features/i18n';
 import { Button, Card, Label, type Palette, Screen, useColors, useThemed } from '@/features/ui';
 import { useSecretScreen } from '@/features/use-secret-screen';
 import { useWallet } from '@/features/wallet/store';
@@ -39,6 +40,7 @@ function makeQuiz(phrase: string) {
 
 export default function Create() {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   const [draft, setDraft] = useState(createDraft);
   // 저장 중에 찍힌 스크린샷도 알 수 있게 지금 보이는 문구를 ref로 따라간다
@@ -56,9 +58,7 @@ export default function Create() {
     setDraft(next);
     setPicked({});
     setStep('write');
-    setError(
-      '스크린샷이 감지되어 복구 문구를 새로 만들었습니다. 사진 앱의 스크린샷도 지워 주세요.',
-    );
+    setError(t.create.screenshotRegenerated);
   });
 
   const answered = quiz.every((q) => picked[q.position] !== undefined);
@@ -84,7 +84,7 @@ export default function Create() {
       <Screen
         footer={
           <Button
-            title="적어 두었습니다"
+            title={t.create.written}
             onPress={() => {
               setPicked({});
               setError(null);
@@ -93,10 +93,7 @@ export default function Create() {
           />
         }
       >
-        <Label style={{ lineHeight: 22 }}>
-          아래 12단어를 순서대로 종이에 적어 두세요. 이 문구가 지갑 그 자체입니다. 앱을 지우거나
-          기기를 잃어도 이 문구로만 되찾을 수 있습니다.
-        </Label>
+        <Label style={{ lineHeight: 22 }}>{t.create.writeIntro}</Label>
         <Card>
           <View style={styles.words}>
             {draft.phrase.split(' ').map((word, i) => (
@@ -112,10 +109,13 @@ export default function Create() {
           </View>
         </Card>
         <Label muted size={13} style={{ lineHeight: 20 }}>
-          스크린샷·화면 녹화는 막혀 있고, 찍히면 문구를 새로 만듭니다. 문구를 묻는 사람이나 사이트는
-          모두 사기입니다.
+          {t.create.captureNote}
         </Label>
-        {__DEV__ && <Label muted size={12}>{`생성·파생 ${draft.elapsedMs}ms`}</Label>}
+        {__DEV__ && (
+          <Label muted size={12}>
+            {t.create.derived(draft.elapsedMs)}
+          </Label>
+        )}
         {error && <Label color={c.danger}>{error}</Label>}
       </Screen>
     );
@@ -127,7 +127,7 @@ export default function Create() {
         <>
           {answered && !correct && (
             <Label size={13} color={c.danger}>
-              맞지 않는 단어가 있습니다. 적어 둔 문구를 다시 확인해 주세요.
+              {t.create.wrongWords}
             </Label>
           )}
           {error && (
@@ -135,23 +135,23 @@ export default function Create() {
               {error}
             </Label>
           )}
-          <Button title="지갑 만들기" busy={busy} disabled={!correct} onPress={confirm} />
+          <Button title={t.create.createWallet} busy={busy} disabled={!correct} onPress={confirm} />
           <Pressable
             accessibilityRole="button"
             onPress={() => setStep('write')}
             style={styles.back}
           >
             <Label bold size={14} color={c.accent}>
-              문구 다시 보기
+              {t.create.showAgain}
             </Label>
           </Pressable>
         </>
       }
     >
-      <Label style={{ lineHeight: 22 }}>적어 둔 문구에서 아래 순서의 단어를 고르세요.</Label>
+      <Label style={{ lineHeight: 22 }}>{t.create.quizIntro}</Label>
       {quiz.map((q) => (
         <Card key={q.position} style={{ gap: 12 }}>
-          <Label bold>{`${q.position + 1}번째 단어`}</Label>
+          <Label bold>{t.create.nthWord(q.position + 1)}</Label>
           <View style={styles.options}>
             {q.options.map((option) => {
               const selected = picked[q.position] === option;

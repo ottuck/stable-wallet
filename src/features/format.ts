@@ -25,11 +25,6 @@ export function formatTime(ms: number): string {
     .join(':');
 }
 
-export function formatDate(ms: number): string {
-  const d = new Date(ms);
-  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
-}
-
 export function openExplorer(network: NetworkConfig, path: `tx/${string}` | `token/${string}`) {
   void Linking.openURL(`${network.explorerUrl}/${path}`);
 }
