@@ -49,7 +49,14 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={theme}>
       <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShadowVisible: false }}>
+      {/* 제목은 iOS 기본(가운데, 17pt 굵게)과 같게 적어 웹에서도 같은 모양으로 보이게 한다 */}
+      <Stack
+        screenOptions={{
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+          headerTitleStyle: { fontSize: 17, fontWeight: '600' },
+        }}
+      >
         <Stack.Protected guard={status === 'ready'}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="send" options={withHomeBack(t.nav.send)} />
