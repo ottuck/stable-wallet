@@ -62,3 +62,9 @@ config만으로 동작하는지 확인. 새 기능 없음.
 ## Phase 4 — Native Bitcoin (선택)
 
 `core/btc`(UTXO, coin selection, PSBT). EVM 계정 모델과 비교 학습용.
+
+## 전시 데모
+
+- [x] `pnpm demo`: 웹에서 가짜 데이터로 지갑 전체 흐름(보내기 → 확정)을 휴대폰 틀 안에서 보여준다
+- [ ] 전시용 값(`demo/data.ts`)과 시작 화면(`?state=`) 정하기
+- [ ] 전시 기기·브라우저에서 리허설

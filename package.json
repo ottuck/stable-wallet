@@ -7,6 +7,7 @@
     "start": "expo start",
     "ios": "expo start --ios",
     "android": "expo start --android",
+    "demo": "node demo/start.mjs",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
@@ -45,6 +46,7 @@
     "zustand": "5.0.15"
   },
   "devDependencies": {
+    "@expo/metro-runtime": "~58.0.15",
     "@types/jest": "30.0.0",
     "@types/react": "~19.3.0",
     "eslint": "9.39.5",
@@ -53,6 +55,8 @@
     "jest": "30.5.2",
     "jest-expo": "58.0.11",
     "prettier": "3.9.10",
+    "react-dom": "19.3.0",
+    "react-native-web": "0.21.4",
     "typescript": "~6.0.3"
   },
   "jest": {

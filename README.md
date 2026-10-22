@@ -18,6 +18,7 @@ A lightweight self-custody EVM stablecoin wallet built with React Native (Expo).
 pnpm install
 pnpm start          # Metro for the development build
 pnpm check          # lint + typecheck + test + format
+pnpm demo           # web demo with fake data in a phone frame (no keys, no network)
 ```
 
 The app runs as an Expo development build (`eas build --profile development --platform ios`), not in Expo Go.

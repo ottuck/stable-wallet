@@ -19,6 +19,7 @@
 ```bash
 pnpm start                 # Metro (개발용 빌드에서 연다, Expo Go 아님)
 pnpm check                 # lint + typecheck + test + format:check — 끝내기 전에 통과시킨다
+pnpm demo                  # 가짜 데이터 웹 데모(휴대폰 틀) — 전시·화면 확인용, demo/ 참고
 pnpm exec expo install <pkg>   # 패키지 추가는 항상 이걸로(SDK 호환 버전). pnpm add 직접 금지(ethers 등 순수 JS 고정 버전 제외)
 pnpm dlx expo-doctor       # 의존성·설정 진단
 ```
@@ -32,6 +33,7 @@ pnpm dlx expo-doctor       # 의존성·설정 진단
 - `src/app/` 화면(Expo Router) · `src/features/` 화면별 UI·hook · `src/core/` React를 모르는 지갑 로직.
 - `core`는 `app`/`features`/React를 import하지 않는다. secure-store는 `core/keys`만 쓴다.
 - 경로 별칭 `@/` = `src/`.
+- `demo/`는 전시용 가짜 데이터와 가짜 경계(db·history·vault·provider)만 둔다. `src`는 `demo`를 import하지 않는다. 그 네 파일의 export를 바꾸면 `demo/stubs`도 같이 고친다.
 
 ## 문서 갱신
 
