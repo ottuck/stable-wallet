@@ -53,7 +53,7 @@ function Toast() {
   return (
     <View
       pointerEvents="none"
-      style={{ position: 'absolute', left: 16, right: 16, top: 84, alignItems: 'center' }}
+      style={{ position: 'absolute', left: 16, right: 16, top: 116, alignItems: 'center' }}
     >
       <View
         style={{
