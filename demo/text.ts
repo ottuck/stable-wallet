@@ -4,7 +4,7 @@ import { useLocale, type Locale } from '@/features/i18n';
 const ko = {
   bannerLead: '예시 데이터로 보는 데모예요.',
   bannerBody: '실제 돈은 오가지 않으니 보내기·받기·스캔을 마음껏 눌러 보세요.',
-  notCopied: '데모에서는 주소를 복사하지 않습니다',
+  notCopied: '데모에서는 복사하지 않습니다',
   notShared: '데모에서는 주소를 공유하지 않습니다',
   noExplorer: '데모 거래라 탐색기에 기록이 없습니다',
   importNote:
@@ -14,7 +14,7 @@ const ko = {
 const en: typeof ko = {
   bannerLead: 'A demo with sample data.',
   bannerBody: 'No real money moves, so try sending, receiving and scanning freely.',
-  notCopied: 'Addresses are not copied in the demo',
+  notCopied: 'Copying is off in the demo',
   notShared: 'Addresses are not shared in the demo',
   noExplorer: 'Demo transactions are not on the block explorer',
   importNote:

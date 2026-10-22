@@ -12,6 +12,7 @@ export const ko = {
     import: '지갑 가져오기',
     found: '기존 지갑',
     home: '홈',
+    tx: '거래 상세',
   },
   common: {
     cancel: '취소',
@@ -147,6 +148,14 @@ export const ko = {
     maximum: '최대',
     details: '서명할 트랜잭션 상세 (EIP-1559)',
   },
+  tx: {
+    to: '받는 주소',
+    network: '네트워크',
+    sentAt: '보낸 시각',
+    hash: '거래 hash',
+    copyHash: '거래 hash 복사',
+    notFound: '이 거래를 찾지 못했습니다',
+  },
   status: {
     pending: '블록 포함을 기다리는 중',
     confirmed: '보냈습니다',
@@ -202,6 +211,7 @@ export const en: Messages = {
     import: 'Import wallet',
     found: 'Existing wallet',
     home: 'Home',
+    tx: 'Transaction',
   },
   common: {
     cancel: 'Cancel',
@@ -340,6 +350,14 @@ export const en: Messages = {
     estimated: 'Estimated',
     maximum: 'Maximum',
     details: 'Transaction details (EIP-1559)',
+  },
+  tx: {
+    to: 'To',
+    network: 'Network',
+    sentAt: 'Sent',
+    hash: 'Transaction hash',
+    copyHash: 'Copy transaction hash',
+    notFound: 'Transaction not found',
   },
   status: {
     pending: 'Waiting for confirmation',

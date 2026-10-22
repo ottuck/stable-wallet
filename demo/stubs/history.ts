@@ -53,6 +53,12 @@ export const listTxs: typeof Real.listTxs = (fromAddress, networkId, limit = 20)
     .slice(0, limit);
 };
 
+// 실제(SQLite)처럼 읽을 때마다 새 객체를 돌려준다. 같은 객체면 상태가 바뀌어도 화면이 다시 그려지지 않는다
+export const getTx: typeof Real.getTx = (hash) => {
+  const tx = txs.find((t) => t.hash === hash);
+  return tx ? { ...tx } : null;
+};
+
 export const hasSentTo: typeof Real.hasSentTo = (fromAddress, toAddress) =>
   txs.some(
     (t) => t.fromAddress === fromAddress && t.toAddress.toLowerCase() === toAddress.toLowerCase(),

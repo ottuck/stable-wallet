@@ -5,13 +5,15 @@ import { CheckIcon, CopyIcon } from './icons';
 import { useT } from './i18n';
 import { IconButton, useColors } from './ui';
 
-/** 주소(공개 정보)만 복사한다. 복사하면 잠깐 체크 표시로 바뀐다. */
+/** 주소·거래 hash(공개 정보)만 복사한다. 복사하면 잠깐 체크 표시로 바뀐다. label은 스크린리더 이름(기본: 주소 복사) */
 export function CopyButton({
   value,
+  label,
   filled,
   color,
 }: {
   value: string;
+  label?: string;
   filled?: boolean;
   color?: string;
 }) {
@@ -27,7 +29,7 @@ export function CopyButton({
 
   return (
     <IconButton
-      label={copied ? t.common.copied : t.common.copyAddress}
+      label={copied ? t.common.copied : (label ?? t.common.copyAddress)}
       filled={filled}
       onPress={() => {
         void Clipboard.setStringAsync(value);
