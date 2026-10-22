@@ -1,4 +1,4 @@
-# Stable Wallet — 에이전트 작업 규칙
+# Henry Wallet — 에이전트 작업 규칙
 
 개인용 self-custody EVM stablecoin 지갑(Expo SDK 58, React Native, TypeScript). iPhone 개발용 빌드가 기준.
 
