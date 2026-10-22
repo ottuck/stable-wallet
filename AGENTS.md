@@ -31,6 +31,7 @@ pnpm dlx expo-doctor       # 의존성·설정 진단
 ## 코드 구조
 
 - `src/app/` 화면(Expo Router) · `src/features/` 화면별 UI·hook · `src/core/` React를 모르는 지갑 로직.
+- 지갑 로직(거래 순서·저장·검증)은 화면에 두지 않고 `core`에 둔다. 서버가 없어도 서비스(core)와 화면을 나눈다. 거래 흐름은 `core/transfer.ts`(서명 → 전송 전 pending 저장 → 전송 → 확인)에만 있고 화면은 부르기만 한다.
 - `core`는 `app`/`features`/React를 import하지 않는다. secure-store는 `core/keys`만 쓴다.
 - 경로 별칭 `@/` = `src/`.
 - `demo/`는 전시용 가짜 데이터와 가짜 경계(db·history·vault·provider)만 둔다. `src`는 `demo`를 import하지 않는다. 그 네 파일의 export를 바꾸면 `demo/stubs`도 같이 고친다.

@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { formatAmount } from '@/core/amount';
-import { waitForReceipt, type ReceiptResult } from '@/core/evm/send';
-import { updateTxStatus } from '@/core/history';
+import type { ReceiptResult } from '@/core/evm/send';
+import { waitForTransfer } from '@/core/transfer';
 import { formatTime, openExplorer, shortAddress, shortHash } from '@/features/format';
 import { AlertIcon, CheckIcon, ClockIcon } from '@/features/icons';
 import { useSendFlow } from '@/features/send/store';
@@ -36,8 +36,7 @@ export default function SendStatus() {
   useEffect(() => {
     if (!p || !sent) return;
     let active = true;
-    waitForReceipt(p.network, sent.hash).then((r) => {
-      if (r.status !== 'pending') updateTxStatus(sent.hash, r.status);
+    waitForTransfer(p.network, sent.hash).then((r) => {
       if (active) setResult(r);
     });
     return () => {

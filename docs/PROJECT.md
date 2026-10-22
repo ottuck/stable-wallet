@@ -56,6 +56,7 @@ src/
     ├── config/     # networks.ts, tokens.ts
     ├── keys/       # mnemonic 생성·검증·파생, secure-store 접근 (mnemonic을 만지는 유일한 곳)
     ├── evm/        # provider(RPC 연결 지점), 잔액, 수수료, 전송, receipt
+    ├── transfer.ts # 거래 흐름: 서명 → 저장 → 전송 → 확인(서버가 없어 앱 안에서 이어 붙이는 지점)
     ├── db.ts · history.ts  # SQLite tx 저장소
     └── errors.ts   # WalletError(code)
 
@@ -67,6 +68,7 @@ demo/               # 전시용 웹 데모(pnpm demo). 가짜 데이터와 가�
 ```
 
 - `core`는 `app`/`features`/React를 import하지 않는다.
+- 지갑 로직은 화면에 두지 않는다. 서버가 없어도 앱 안에서 "서비스(core)"와 "화면(app·features)"을 나눈다: 거래를 이어 붙이는 순서·불변식(서명 → 전송 전 pending 저장 → 전송 → receipt 반영)은 `core/transfer.ts`에만 두고, 화면은 그 함수를 부르고 결과를 그리기만 한다. 새 흐름(예: 다른 체인)도 같은 방식으로 core에 둔다.
 - 체인 코드는 `core/evm`에만 둔다. Bitcoin을 하게 되면 `core/btc`를 같은 모양(잔액·수수료·전송·주소 검증)으로 더하고, 지금은 공통 인터페이스를 미리 만들지 않는다.
 - History는 `core/history` 함수로만 접근한다(나중에 동기화를 붙이더라도 지갑 로직은 모른다).
 - 데모: `pnpm demo`는 앱 바깥과 닿는 경계 네 곳(`core/db`, `core/history`, `core/keys/vault`, `core/evm/provider`)만 `demo/stubs`로 바꿔 웹에서 연다. 수수료 계산·서명·전송 로직은 실제 코드가 그대로 돈다. `src`는 `demo`를 import하지 않고, 가짜 값은 `demo/data.ts`에만 둔다. 경계 파일의 export가 바뀌면 stub도 같이 고친다(stub이 실제 함수 타입을 따라 typecheck가 알려준다). 주소창 `?state=empty|found|error`로 시작 화면을 고른다. 키는 페이지 메모리에만 있고 새로고침하면 새로 만들어진다.
