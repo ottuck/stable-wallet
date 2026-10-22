@@ -103,7 +103,9 @@ export const ko = {
     notAddress: '지갑 주소 QR이 아닙니다.',
     otherNetwork: (chainId: number, name: string) =>
       `다른 네트워크(chainId ${chainId})용 QR입니다. 지금은 ${name}입니다.`,
-    needCamera: '주소 QR을 읽으려면 카메라 권한이 필요합니다.',
+    cameraTitle: '카메라를 허용해 주세요',
+    cameraBody: '받는 사람의 주소 QR을 읽는 데만 쓰고, 사진이나 영상은 저장하지 않습니다.',
+    cameraBlocked: '카메라 접근이 꺼져 있습니다. 설정에서 허용하면 QR을 읽을 수 있습니다.',
     openSettings: '설정에서 허용',
     allowCamera: '카메라 허용',
     aim: '받는 사람의 주소 QR을 비춰 주세요',
@@ -293,7 +295,9 @@ export const en: Messages = {
     notAddress: 'That QR code isn’t a wallet address.',
     otherNetwork: (chainId: number, name: string) =>
       `This QR code is for a different network (chain ID ${chainId}). You’re on ${name}.`,
-    needCamera: 'Allow camera access to scan an address QR code.',
+    cameraTitle: 'Allow camera access',
+    cameraBody: 'Used only to read the recipient’s address QR code. Nothing is saved.',
+    cameraBlocked: 'Camera access is off. Turn it on in Settings to scan QR codes.',
     openSettings: 'Open Settings',
     allowCamera: 'Allow camera',
     aim: 'Point the camera at the recipient’s QR code',
