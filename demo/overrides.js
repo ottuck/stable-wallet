@@ -1,5 +1,5 @@
 // 데모 모드(STABLE_WALLET_DEMO=1)에서 Metro가 실제 파일 대신 demo/ 의 가짜 파일을 쓰게 한다.
-// 바꾸는 곳은 앱 바깥과 닿는 경계뿐이다: 저장소(SQLite), 키 보관(secure-store), RPC 연결.
+// 바꾸는 곳은 앱 바깥과 닿는 경계뿐이다: 저장소(SQLite), 키 보관(secure-store), RPC 연결, 웹에 없는 스크린샷 차단 API.
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
@@ -10,6 +10,7 @@ const files = new Map([
   swap('src/core/history.ts', 'stubs/history.ts'),
   swap('src/core/keys/vault.ts', 'stubs/vault.ts'),
   swap('src/core/evm/provider.ts', 'stubs/provider.ts'),
+  swap('src/features/use-secret-screen.ts', 'stubs/use-secret-screen.ts'),
 ]);
 
 const entry = path.resolve(__dirname, 'entry.tsx');
