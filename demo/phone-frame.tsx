@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { Platform, Text, useColorScheme, useWindowDimensions, View } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
+import Svg, { Path, Rect } from 'react-native-svg';
 
 import { useColors } from '@/features/ui';
 
@@ -73,7 +74,7 @@ export function PhoneFrame({ children }: PropsWithChildren) {
             }}
           >
             <Text style={{ color: ink, fontSize: 16, fontWeight: '700' }}>9:41</Text>
-            <Text style={{ color: ink, fontSize: 13, fontWeight: '700' }}>5G ▂▄▆ ▮</Text>
+            <StatusIcons ink={ink} />
           </View>
           <View
             pointerEvents="none"
@@ -113,6 +114,34 @@ export function PhoneFrame({ children }: PropsWithChildren) {
       >
         Henry Wallet demo · fake data, no real assets / 가짜 데이터 · 실제 자산 아님
       </Text>
+    </View>
+  );
+}
+
+/** iPhone 상태 표시줄 오른쪽: 신호 막대 네 개, 5G, 배터리 */
+function StatusIcons({ ink }: { ink: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <Svg width={18} height={12} viewBox="0 0 18 12">
+        {[0, 1, 2, 3].map((i) => (
+          <Rect key={i} x={i * 5} y={9 - i * 3} width={3} height={3 + i * 3} rx={1} fill={ink} />
+        ))}
+      </Svg>
+      <Text style={{ color: ink, fontSize: 14, fontWeight: '700', letterSpacing: -0.2 }}>5G</Text>
+      <Svg width={27} height={13} viewBox="0 0 27 13">
+        <Rect
+          x={0.5}
+          y={0.5}
+          width={23}
+          height={12}
+          rx={3.5}
+          fill="none"
+          stroke={ink}
+          strokeOpacity={0.4}
+        />
+        <Rect x={2} y={2} width={17} height={9} rx={2} fill={ink} />
+        <Path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill={ink} fillOpacity={0.4} />
+      </Svg>
     </View>
   );
 }

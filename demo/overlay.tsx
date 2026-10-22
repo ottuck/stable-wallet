@@ -2,29 +2,32 @@ import { useEffect, useState, type PropsWithChildren } from 'react';
 import { Animated, Text, View } from 'react-native';
 
 import { FaceIdIcon } from '@/features/icons';
+import { useColors } from '@/features/ui';
 
 import { useDemoOverlay } from './notice';
 import { useDemoText } from './text';
 
 /**
- * 앱 화면 위에 늘 보이는 DEMO 띠를 두고, 가짜 파일이 띄우는 안내(토스트)와 Face ID 장면을 그린다.
+ * 앱 화면 위에 늘 보이는 데모 안내 줄을 두고, 가짜 파일이 띄우는 안내(토스트)와 Face ID 장면을 그린다.
  * 폰 틀이 있든 없든(좁은 화면) 같은 모양이다.
  */
 export function DemoLayer({ children }: PropsWithChildren) {
+  const c = useColors();
   const d = useDemoText();
   return (
     <View style={{ flex: 1 }}>
       <View
         accessibilityRole="text"
         style={{
-          height: 24,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#FFE9A0',
+          paddingHorizontal: 16,
+          paddingVertical: 7,
+          backgroundColor: c.segment,
+          borderBottomWidth: 1,
+          borderBottomColor: c.border,
         }}
       >
-        <Text style={{ fontSize: 11, fontWeight: '800', color: '#5C2E00', letterSpacing: 0.3 }}>
-          {d.banner}
+        <Text style={{ fontSize: 12, lineHeight: 17, color: c.muted, textAlign: 'center' }}>
+          <Text style={{ fontWeight: '700', color: c.text }}>{d.bannerLead}</Text> {d.bannerBody}
         </Text>
       </View>
       <View style={{ flex: 1 }}>{children}</View>

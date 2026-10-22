@@ -1,24 +1,17 @@
 import { useEffect, useState } from 'react';
-import {
-  Animated,
-  Easing,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
-
-import { ScanIcon } from '@/features/icons';
+import { Animated, Easing, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 import { DEMO } from '../data';
-import { useDemoText } from '../text';
 
 // expo-camera 대신. 공개 데모가 방문자에게 카메라 권한을 묻지 않도록 카메라는 켜지 않는다.
-// 어두운 가짜 뷰파인더와 "예시 QR 읽기" 버튼을 보여주고, 누르면 예시 받는 주소를 읽은 것처럼 넘긴다.
+// 어두운 뷰파인더에 예시 QR이 비친 것처럼 보여주고, 잠깐 뒤 예시 받는 주소를 읽은 것처럼 넘긴다.
+// 화면의 QR에는 주소가 아니라 안내 글이 담겨 있어 다른 기기로 찍어도 송금 주소가 되지 않는다.
 
 export type BarcodeScanningResult = { type: string; data: string };
+
+/** 뷰파인더가 열린 뒤 QR을 "인식"하기까지 */
+const RECOGNIZE_MS = 1800;
 
 const granted = { granted: true, canAskAgain: true, status: 'granted', expires: 'never' };
 
@@ -33,25 +26,36 @@ export function CameraView({
   style?: StyleProp<ViewStyle>;
   onBarcodeScanned?: (result: BarcodeScanningResult) => void;
 }) {
-  const d = useDemoText();
   const [line] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const loop = Animated.loop(
       Animated.timing(line, {
         toValue: 1,
-        duration: 1800,
+        duration: 1400,
         easing: Easing.inOut(Easing.quad),
         useNativeDriver: false,
       }),
     );
     loop.start();
-    return () => loop.stop();
+    const timer = setTimeout(
+      () => onBarcodeScanned?.({ type: 'qr', data: DEMO.recipient }),
+      RECOGNIZE_MS,
+    );
+    return () => {
+      loop.stop();
+      clearTimeout(timer);
+    };
+    // 처음 열 때 한 번만 인식한다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [line]);
 
   return (
     <View style={[style, styles.root]}>
       <View style={styles.glow} />
+      <View style={styles.paper}>
+        <QRCode value={DEMO.qrText} size={150} color="#1A1D24" backgroundColor="#F4F1EA" />
+      </View>
       <Animated.View
         pointerEvents="none"
         style={[
@@ -63,17 +67,6 @@ export function CameraView({
           },
         ]}
       />
-      <View style={styles.actions}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => onBarcodeScanned?.({ type: 'qr', data: DEMO.recipient })}
-          style={({ pressed }) => [styles.sample, pressed && { opacity: 0.7 }]}
-        >
-          <ScanIcon size={18} color="#0F1115" />
-          <Text style={styles.sampleText}>{d.scanSample}</Text>
-        </Pressable>
-        <Text style={styles.note}>{d.scanNote}</Text>
-      </View>
     </View>
   );
 }
@@ -88,6 +81,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B2748',
     opacity: 0.5,
   },
+  // 카메라에 비친 종이처럼 살짝 기울이고 어둡게
+  paper: {
+    padding: 14,
+    borderRadius: 10,
+    backgroundColor: '#F4F1EA',
+    opacity: 0.88,
+    transform: [{ rotate: '-4deg' }],
+  },
   line: {
     position: 'absolute',
     width: 220,
@@ -96,16 +97,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#7C9DFF',
     boxShadow: '0 0 12px #7C9DFF',
   },
-  actions: { position: 'absolute', bottom: 150, alignItems: 'center', gap: 10 },
-  sample: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    height: 48,
-    paddingHorizontal: 20,
-    borderRadius: 24,
-    backgroundColor: '#FFFFFF',
-  },
-  sampleText: { color: '#0F1115', fontSize: 15, fontWeight: '700' },
-  note: { color: '#9AA1AD', fontSize: 12 },
 });
