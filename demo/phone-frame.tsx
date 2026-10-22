@@ -109,7 +109,7 @@ export function PhoneFrame({ children }: PropsWithChildren) {
           fontSize: 12,
         }}
       >
-        Henry Wallet 데모 · 가짜 데이터이며 실제 자산과 상관없습니다
+        Henry Wallet demo · fake data, no real assets / 가짜 데이터 · 실제 자산 아님
       </Text>
     </View>
   );

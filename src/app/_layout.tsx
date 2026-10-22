@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { useT } from '@/features/i18n';
 import { useColors } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
@@ -14,6 +15,7 @@ void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const c = useColors();
+  const t = useT();
   const base = useColorScheme() === 'dark' ? DarkTheme : DefaultTheme;
   // 헤더·배경은 앱 팔레트를 쓴다
   const theme = {
@@ -41,13 +43,13 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShadowVisible: false }}>
         <Stack.Protected guard={status === 'ready'}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="send" options={{ title: '보내기' }} />
-          <Stack.Screen name="send-review" options={{ title: '서명 전 확인' }} />
+          <Stack.Screen name="send" options={{ title: t.nav.send }} />
+          <Stack.Screen name="send-review" options={{ title: t.nav.review }} />
           <Stack.Screen
             name="send-status"
             options={{ headerShown: false, gestureEnabled: false }}
           />
-          <Stack.Screen name="receive" options={{ title: '받기' }} />
+          <Stack.Screen name="receive" options={{ title: t.nav.receive }} />
           <Stack.Screen
             name="scan"
             options={{ headerShown: false, presentation: 'fullScreenModal' }}
@@ -55,11 +57,11 @@ export default function RootLayout() {
         </Stack.Protected>
         <Stack.Protected guard={status === 'empty'}>
           <Stack.Screen name="welcome" options={{ title: 'Henry Wallet' }} />
-          <Stack.Screen name="create" options={{ title: '새 지갑' }} />
-          <Stack.Screen name="import" options={{ title: '지갑 가져오기' }} />
+          <Stack.Screen name="create" options={{ title: t.nav.create }} />
+          <Stack.Screen name="import" options={{ title: t.nav.import }} />
         </Stack.Protected>
         <Stack.Protected guard={status === 'found'}>
-          <Stack.Screen name="found" options={{ title: '기존 지갑' }} />
+          <Stack.Screen name="found" options={{ title: t.nav.found }} />
         </Stack.Protected>
         <Stack.Protected guard={status === 'error'}>
           <Stack.Screen name="unavailable" options={{ title: 'Henry Wallet' }} />

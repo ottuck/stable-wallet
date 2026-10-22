@@ -46,12 +46,16 @@ MetaMask와의 차이: MetaMask는 앱 비밀번호로 암호화한 vault를 저
 
 iOS Keychain은 앱을 지워도 남고 SQLite는 지워진다. SQLite가 새로 만들어졌는데(설치 표시 없음) secure-store에 주소가 있으면 "기존 지갑 계속 쓰기"와 "지우고 새로 시작"을 묻는다. 지우기는 mnemonic과 주소를 모두 삭제한다.
 
+## 언어
+
+한국어·영어를 지원한다. 화면에 보이는 문구는 모두 `features/i18n/messages.ts`에 있다: `ko`가 기준이고 `en`은 같은 모양이어야 한다(빠뜨리면 typecheck가 알려준다). 컴포넌트는 `useT()`, 이벤트 핸들러는 `currentMessages()`로 읽는다. `core`에는 문구를 두지 않고 에러는 `WalletError`의 `code`로 `messages.errors`에서 고른다. 언어는 자동(기기 언어가 한국어면 한국어, 그 밖에는 영어) · 한국어 · English 중 고르며, 선택은 SQLite `meta`에 저장한다(홈 아래쪽과 환영 화면에서 바꾼다). 토큰 금액·주소·hash 표기는 언어와 무관하다.
+
 ## 구조
 
 ```text
 src/
 ├── app/            # 화면(Expo Router). 로직은 features/core를 부른다
-├── features/       # 화면 단위 UI·hook: onboarding, home, send, receive, history
+├── features/       # 화면 단위 UI·hook: onboarding, home, send, receive, history, i18n(문구·언어)
 └── core/           # React를 모르는 지갑 로직
     ├── config/     # networks.ts, tokens.ts
     ├── keys/       # mnemonic 생성·검증·파생, secure-store 접근 (mnemonic을 만지는 유일한 곳)

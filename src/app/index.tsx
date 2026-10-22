@@ -10,9 +10,11 @@ import type { WalletTx } from '@/core/history';
 import { withSigner } from '@/core/keys/vault';
 import { CopyButton } from '@/features/copy-button';
 import { errorMessage } from '@/features/error-message';
-import { formatDate, openExplorer, shortAddress, shortHash } from '@/features/format';
+import { openExplorer, shortAddress, shortHash } from '@/features/format';
 import { useRecentTxs } from '@/features/history/use-recent-txs';
 import { useBalances } from '@/features/home/use-balances';
+import { useT } from '@/features/i18n';
+import { LanguagePicker } from '@/features/i18n/language-picker';
 import { ChevronDownIcon, ClockIcon, ReceiveIcon, ScanIcon, SendIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import {
@@ -31,6 +33,7 @@ import { useWallet } from '@/features/wallet/store';
 
 export default function Home() {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   const address = useWallet((s) => s.address)!;
   const { network, setNetwork } = useNetwork();
@@ -62,7 +65,7 @@ export default function Home() {
     }
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: [...activeNetworks.map((n) => n.name), '취소'],
+        options: [...activeNetworks.map((n) => n.name), t.common.cancel],
         cancelButtonIndex: activeNetworks.length,
       },
       (i) => i < activeNetworks.length && setNetwork(activeNetworks[i]),
@@ -81,7 +84,7 @@ export default function Home() {
       <View style={styles.topRow}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`네트워크: ${network.name}. 바꾸기`}
+          accessibilityLabel={t.home.networkLabel(network.name)}
           onPress={pickNetwork}
           style={styles.networkButton}
         >
@@ -96,7 +99,7 @@ export default function Home() {
         <View style={styles.addressRow}>
           <View style={{ gap: 2 }}>
             <Label muted size={12}>
-              내 주소
+              {t.home.myAddress}
             </Label>
             <Address value={address} short />
           </View>
@@ -123,13 +126,13 @@ export default function Home() {
         </View>
 
         <View style={styles.actions}>
-          <Action label="보내기" primary onPress={() => router.push('/send')}>
+          <Action label={t.home.send} primary onPress={() => router.push('/send')}>
             <SendIcon size={22} color={c.onPrimary} strokeWidth={2.2} />
           </Action>
-          <Action label="받기" onPress={() => router.push('/receive')}>
+          <Action label={t.home.receive} onPress={() => router.push('/receive')}>
             <ReceiveIcon size={22} color={c.accentText} strokeWidth={2.2} />
           </Action>
-          <Action label="스캔" onPress={() => router.push('/scan?from=home')}>
+          <Action label={t.home.scan} onPress={() => router.push('/scan?from=home')}>
             <ScanIcon size={22} color={c.accentText} strokeWidth={2.2} />
           </Action>
         </View>
@@ -138,12 +141,12 @@ export default function Home() {
       {native && <GasCard balance={native} transferFee={transferFee} />}
 
       <Label bold size={14} style={{ paddingHorizontal: 4 }}>
-        보낸 거래
+        {t.home.sentTxs}
       </Label>
       <Card style={{ paddingVertical: 4, gap: 0 }}>
         {txs.length === 0 ? (
           <Label muted size={13} style={{ paddingVertical: 14, lineHeight: 20 }}>
-            이 앱에서 보낸 거래가 여기에 쌓입니다. 받은 입금은 위 잔액에 바로 반영됩니다.
+            {t.home.noTxs}
           </Label>
         ) : (
           txs.map((tx, i) => (
@@ -157,6 +160,13 @@ export default function Home() {
         )}
       </Card>
 
+      <Card style={{ gap: 10 }}>
+        <Label muted size={12}>
+          {t.common.language}
+        </Label>
+        <LanguagePicker />
+      </Card>
+
       {__DEV__ && <DevTools address={address} />}
     </Screen>
   );
@@ -164,14 +174,15 @@ export default function Home() {
 
 function RpcStatus({ loading, failed }: { loading: boolean; failed: boolean }) {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   const [color, text] = loading
-    ? [c.placeholder, '확인 중']
+    ? [c.placeholder, t.home.rpcChecking]
     : failed
-      ? [c.danger, '연결 안 됨']
-      : [c.ok, '연결됨'];
+      ? [c.danger, t.home.rpcFailed]
+      : [c.ok, t.home.rpcOk];
   return (
-    <View style={styles.status} accessibilityLabel={`네트워크 ${text}`}>
+    <View style={styles.status} accessibilityLabel={t.home.rpcLabel(text)}>
       <View style={[styles.dot, { width: 8, height: 8, backgroundColor: color }]} />
       <Label muted size={12}>
         {text}
@@ -252,6 +263,7 @@ function TokenRow({
 
 function GasCard({ balance, transferFee }: { balance: AssetBalance; transferFee: bigint | null }) {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   // 지금 수수료로 ERC-20 전송을 몇 번 할 수 있는지(50번을 가득으로 본다)
   const sends = transferFee ? Number(balance.raw / transferFee) : null;
@@ -263,7 +275,7 @@ function GasCard({ balance, transferFee }: { balance: AssetBalance; transferFee:
           <View style={{ gap: 2 }}>
             <Label bold>{balance.symbol}</Label>
             <Label muted size={12}>
-              수수료(가스)로 쓰입니다
+              {t.home.gasNote}
             </Label>
           </View>
         </View>
@@ -285,7 +297,7 @@ function GasCard({ balance, transferFee }: { balance: AssetBalance; transferFee:
             />
           </View>
           <Label muted size={12} color={sends === 0 ? c.danger : undefined}>
-            {sends === 0 ? '전송 불가 · 가스 부족' : `전송 약 ${sends > 999 ? '999+' : sends}회`}
+            {sends === 0 ? t.home.gasShort : t.home.sendsLeft(sends > 999 ? '999+' : String(sends))}
           </Label>
         </View>
       )}
@@ -295,6 +307,7 @@ function GasCard({ balance, transferFee }: { balance: AssetBalance; transferFee:
 
 function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: () => void }) {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   return (
     <Pressable
@@ -312,16 +325,16 @@ function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: ()
         <View style={styles.status}>
           <ClockIcon size={14} color={c.warn} strokeWidth={2.4} />
           <Label bold size={13} color={c.warn}>
-            확정 대기
+            {t.home.pending}
           </Label>
         </View>
       ) : tx.status === 'confirmed' ? (
         <Label muted size={13}>
-          {formatDate(tx.createdAt)}
+          {t.home.date(new Date(tx.createdAt))}
         </Label>
       ) : (
         <Label bold size={13} color={c.danger}>
-          {tx.status === 'failed' ? '실패' : '전송 안 됨'}
+          {tx.status === 'failed' ? t.home.failed : t.home.dropped}
         </Label>
       )}
     </Pressable>
@@ -330,6 +343,7 @@ function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: ()
 
 /** PoC 확인용. 개발 빌드에서만 보인다. */
 function DevTools({ address }: { address: string }) {
+  const t = useT();
   const [check, setCheck] = useState<string | null>(null);
 
   async function checkSigner() {
@@ -337,27 +351,31 @@ function DevTools({ address }: { address: string }) {
     const started = Date.now();
     try {
       const same = await withSigner(async (signer) => signer.address === address);
-      setCheck(`${same ? '일치' : '불일치'} · ${Date.now() - started}ms`);
+      setCheck(`${same ? t.home.devMatch : t.home.devMismatch} · ${Date.now() - started}ms`);
     } catch (e) {
       setCheck(errorMessage(e));
     }
   }
 
   function confirmDelete() {
-    Alert.alert('개발용: 지갑을 지울까요?', '복구 문구가 없으면 되돌릴 수 없습니다.', [
-      { text: '취소', style: 'cancel' },
-      { text: '지우기', style: 'destructive', onPress: () => void useWallet.getState().reset() },
+    Alert.alert(t.home.devConfirmTitle, t.home.devConfirmBody, [
+      { text: t.common.cancel, style: 'cancel' },
+      {
+        text: t.common.delete,
+        style: 'destructive',
+        onPress: () => void useWallet.getState().reset(),
+      },
     ]);
   }
 
   return (
     <Card>
       <Label muted size={12}>
-        개발용
+        {t.home.devTitle}
       </Label>
-      <Button title="Face ID로 서명 키 확인" secondary onPress={() => void checkSigner()} />
+      <Button title={t.home.devCheckSigner} secondary onPress={() => void checkSigner()} />
       {check && <Label size={13}>{check}</Label>}
-      <Button title="지갑 지우기" secondary onPress={confirmDelete} />
+      <Button title={t.home.devDelete} secondary onPress={confirmDelete} />
     </Card>
   );
 }

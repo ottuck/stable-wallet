@@ -2,20 +2,22 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 
 import { errorMessage } from '@/features/error-message';
+import { useT } from '@/features/i18n';
 import { Address, Button, Card, Label, Screen, useColors } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
 /** 재설치 후 Keychain에 남아 있던 지갑(docs/PROJECT.md 재설치 규칙). */
 export default function Found() {
   const c = useColors();
+  const t = useT();
   const address = useWallet((s) => s.address);
   const [error, setError] = useState<string | null>(null);
 
   function confirmReset() {
-    Alert.alert('지갑을 지울까요?', '복구 문구를 적어 두지 않았다면 이 지갑의 자산을 잃습니다.', [
-      { text: '취소', style: 'cancel' },
+    Alert.alert(t.found.confirmTitle, t.found.confirmBody, [
+      { text: t.common.cancel, style: 'cancel' },
       {
-        text: '지우기',
+        text: t.common.delete,
         style: 'destructive',
         onPress: () =>
           useWallet
@@ -30,16 +32,16 @@ export default function Found() {
     <Screen
       footer={
         <>
-          <Button title="이 지갑 계속 쓰기" onPress={() => useWallet.getState().keepFound()} />
-          <Button title="지우고 새로 시작" secondary onPress={confirmReset} />
+          <Button title={t.found.keep} onPress={() => useWallet.getState().keepFound()} />
+          <Button title={t.found.startOver} secondary onPress={confirmReset} />
         </>
       }
     >
-      <Label style={{ lineHeight: 22 }}>이 기기에 이전에 쓰던 지갑이 남아 있습니다.</Label>
+      <Label style={{ lineHeight: 22 }}>{t.found.intro}</Label>
       {address && (
         <Card>
           <Label muted size={12}>
-            지갑 주소
+            {t.found.address}
           </Label>
           <Address value={address} />
         </Card>

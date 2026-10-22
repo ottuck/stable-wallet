@@ -10,6 +10,7 @@ import { tokensOn } from '@/core/config/tokens';
 import { prepareSend } from '@/core/evm/send';
 import { hasSentTo } from '@/core/history';
 import { errorMessage } from '@/features/error-message';
+import { useT } from '@/features/i18n';
 import { useBalances } from '@/features/home/use-balances';
 import { AlertIcon, CheckIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
@@ -37,6 +38,7 @@ function tryParse<T>(fn: () => T): T | null {
 
 export default function SendInput() {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   const address = useWallet((s) => s.address)!;
   const network = useNetwork((s) => s.network);
@@ -90,7 +92,7 @@ export default function SendInput() {
   if (!token) {
     return (
       <Screen>
-        <Label muted>이 네트워크에는 보낼 수 있는 토큰이 없습니다.</Label>
+        <Label muted>{t.send.noTokens}</Label>
       </Screen>
     );
   }
@@ -99,14 +101,14 @@ export default function SendInput() {
     <Screen
       footer={
         <Button
-          title="확인하기"
+          title={t.send.review}
           busy={busy}
           disabled={amount === null || to === null || toSelf}
           onPress={() => void next()}
         />
       }
     >
-      <Stack.Screen options={{ title: '보내기', headerBackTitle: '홈' }} />
+      <Stack.Screen options={{ title: t.nav.send, headerBackTitle: t.nav.home }} />
       <Label muted size={12} style={{ textAlign: 'center', marginTop: -6 }}>
         {network.name}
       </Label>
@@ -134,7 +136,7 @@ export default function SendInput() {
         <View style={styles.amountRow}>
           <TokenIcon symbol={token.symbol} size={28} />
           <TextInput
-            accessibilityLabel="보낼 금액"
+            accessibilityLabel={t.send.amountLabel}
             value={amountText}
             onChangeText={setAmountText}
             placeholder="0"
@@ -149,7 +151,7 @@ export default function SendInput() {
         </View>
         <View style={styles.balanceRow}>
           <Label muted size={12}>
-            잔액{' '}
+            {t.send.balance}{' '}
             <Label mono muted size={12}>
               {balance === null ? '…' : formatAmount(balance, token.decimals)}
             </Label>
@@ -161,13 +163,13 @@ export default function SendInput() {
             hitSlop={12}
           >
             <Label bold size={13} color={c.accent}>
-              최대
+              {t.send.max}
             </Label>
           </Pressable>
         </View>
         {amountText !== '' && amount === null && (
           <Label size={12} color={c.danger}>
-            {`금액을 확인해 주세요 (소수점 ${token.decimals}자리까지)`}
+            {t.send.badAmount(token.decimals)}
           </Label>
         )}
         {amount !== null && (
@@ -180,15 +182,15 @@ export default function SendInput() {
       <Card>
         <View style={styles.toHeader}>
           <Label muted size={12}>
-            받는 주소
+            {t.send.toLabel}
           </Label>
           <View style={styles.toActions}>
-            <TextButton title="붙여넣기" onPress={() => void paste()} />
-            <TextButton title="QR 스캔" onPress={() => router.push('/scan')} />
+            <TextButton title={t.send.paste} onPress={() => void paste()} />
+            <TextButton title={t.send.scanQr} onPress={() => router.push('/scan')} />
           </View>
         </View>
         <TextInput
-          accessibilityLabel="받는 주소"
+          accessibilityLabel={t.send.toLabel}
           value={toText}
           onChangeText={setToText}
           placeholder="0x…"
@@ -203,20 +205,20 @@ export default function SendInput() {
           <View style={styles.checks}>
             {to === null ? (
               <Hint color={c.danger} icon="alert">
-                주소 형식·체크섬이 맞지 않거나 토큰 컨트랙트 주소입니다
+                {t.send.badAddress}
               </Hint>
             ) : toSelf ? (
               <Hint color={c.danger} icon="alert">
-                내 주소로는 보낼 수 없습니다
+                {t.send.toSelf}
               </Hint>
             ) : (
               <>
                 <Hint color={c.muted} icon="check">
-                  체크섬이 맞고, 토큰 컨트랙트 주소가 아닙니다
+                  {t.send.checksumOk}
                 </Hint>
                 {firstTime && (
                   <Hint color={c.warn} icon="alert">
-                    처음 보내는 주소예요. 앞뒤 네 글자를 받는 쪽과 맞춰 보세요
+                    {t.send.firstTime}
                   </Hint>
                 )}
               </>

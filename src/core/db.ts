@@ -38,3 +38,15 @@ export function markInstalled(): void {
     new Date().toISOString(),
   );
 }
+
+/** 앱 설정처럼 비민감한 값을 key-value로 둔다(설치 표시와 같은 meta 표). */
+export function getMeta(key: string): string | null {
+  return (
+    getDb().getFirstSync<{ value: string }>('SELECT value FROM meta WHERE key = ?', key)?.value ??
+    null
+  );
+}
+
+export function setMeta(key: string, value: string): void {
+  getDb().runSync('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)', key, value);
+}

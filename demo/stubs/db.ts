@@ -10,3 +10,11 @@ export const isInstalled: typeof Real.isInstalled = () => installed;
 export const markInstalled: typeof Real.markInstalled = () => {
   installed = true;
 };
+
+const meta = new Map<string, string>();
+
+export const getMeta: typeof Real.getMeta = (key) => meta.get(key) ?? null;
+
+export const setMeta: typeof Real.setMeta = (key, value) => {
+  meta.set(key, value);
+};

@@ -6,6 +6,7 @@ import { formatAmount } from '@/core/amount';
 import type { ReceiptResult } from '@/core/evm/send';
 import { waitForTransfer } from '@/core/transfer';
 import { formatTime, openExplorer, shortAddress, shortHash } from '@/features/format';
+import { useT } from '@/features/i18n';
 import { AlertIcon, CheckIcon, ClockIcon } from '@/features/icons';
 import { useSendFlow } from '@/features/send/store';
 import {
@@ -19,15 +20,9 @@ import {
   useThemed,
 } from '@/features/ui';
 
-const HEADLINE = {
-  pending: '블록 포함을 기다리는 중',
-  confirmed: '보냈습니다',
-  failed: '거래가 실패했습니다',
-  dropped: '전송되지 않았습니다',
-};
-
 export default function SendStatus() {
   const c = useColors();
+  const t = useT();
   const styles = useThemed(makeStyles);
   const p = useSendFlow((s) => s.preview);
   const sent = useSendFlow((s) => s.sent);
@@ -63,9 +58,9 @@ export default function SendStatus() {
             onPress={() => openExplorer(p.network, `tx/${sent.hash}`)}
             style={styles.explorer}
           >
-            <Label bold>{`${p.network.explorerUrl.replace('https://', '')}에서 보기 ↗`}</Label>
+            <Label bold>{t.status.viewOn(p.network.explorerUrl.replace('https://', ''))}</Label>
           </Pressable>
-          <Button title="홈으로" onPress={home} />
+          <Button title={t.status.home} onPress={home} />
         </>
       }
     >
@@ -82,7 +77,7 @@ export default function SendStatus() {
           )}
         </View>
         <Label bold size={22}>
-          {HEADLINE[status]}
+          {t.status[status]}
         </Label>
         <View style={styles.row}>
           <TokenIcon symbol={p.token.symbol} size={22} />
@@ -95,13 +90,13 @@ export default function SendStatus() {
       <Card style={{ gap: 0 }}>
         <Step
           done
-          title="기기에서 서명"
+          title={t.status.stepSigned}
           detail={`Face ID · nonce ${p.nonce}`}
           time={formatTime(sent.sentAt)}
         />
         <Step
           done
-          title="네트워크에 전송"
+          title={t.status.stepBroadcast}
           detail={shortHash(sent.hash)}
           time={formatTime(sent.sentAt)}
           onPress={() => openExplorer(p.network, `tx/${sent.hash}`)}
@@ -110,24 +105,24 @@ export default function SendStatus() {
           last
           done={status === 'confirmed'}
           failed={status === 'failed' || status === 'dropped'}
-          title="블록에 포함"
+          title={t.status.stepIncluded}
           detail={
             status === 'pending'
               ? sent.uncertain
-                ? '전송 응답을 받지 못했어요. 네트워크에 올라갔는지 이어서 확인합니다. 다시 보내기 전에 홈에서 상태를 확인하세요.'
-                : '보통 몇 초 걸려요. 앱을 닫아도 다음에 열 때 이어서 확인합니다.'
+                ? t.status.uncertain
+                : t.status.waiting
               : status === 'confirmed'
-                ? '성공했습니다 (status 1)'
-                : '실패했습니다 (status 0) · 토큰은 나가지 않았고 수수료만 냈습니다'
+                ? t.status.succeeded
+                : t.status.failedDetail
           }
-          time={status === 'pending' ? '대기' : ''}
+          time={status === 'pending' ? t.status.wait : ''}
         />
       </Card>
 
       <Card style={{ gap: 8 }}>
-        <Info k="네트워크" v={p.network.name} />
+        <Info k={t.status.network} v={p.network.name} />
         <Info
-          k="예상 수수료"
+          k={t.status.estimatedFee}
           mono
           v={
             p.estimatedFee === null
@@ -136,12 +131,12 @@ export default function SendStatus() {
           }
         />
         <Info
-          k="실제 수수료"
+          k={t.status.actualFee}
           mono
           muted={fee === undefined}
           v={
             fee === undefined
-              ? '확정 후 표시'
+              ? t.status.afterConfirm
               : `${formatAmount(fee, native.decimals, 6)} ${native.symbol}`
           }
         />
