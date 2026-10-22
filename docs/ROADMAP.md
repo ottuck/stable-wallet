@@ -27,6 +27,7 @@ Phase 2까지가 1차 완성이다. Phase 3·4는 선택.
 - [ ] 재설치 규칙(PROJECT.md)
 - [ ] Balance(native + USDC + JPYC, 테스트넷 JPYC는 JPYC Faucet)
 - [ ] Send(검증·확인 화면·에러 문구)
+- [ ] 보내기 입력: 숫자 키패드(소수점·지우기·길게 눌러 비우기·최대), 붙여넣기·QR, "직접 입력" 때 시스템 키보드와 키패드 전환, 작은 기기·큰 글씨·한국어/영어에서 한 화면에 들어가는지
 - [ ] Receive(주소, 복사, QR, 네트워크 경고)
 - [ ] QR 스캔 → 수신자 입력
 - [ ] History(pending → confirmed/failed/dropped, 재시작 후 이어서 확인)
