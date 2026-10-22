@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { NETWORKS, type NetworkConfig } from '@/core/config/networks';
-import { checkReceipt } from '@/core/evm/send';
-import { listPendingTxs, listTxs, updateTxStatus } from '@/core/history';
+import type { NetworkConfig } from '@/core/config/networks';
+import { listTxs } from '@/core/history';
+import { refreshPendingTransfers } from '@/core/transfer';
 
 /**
  * 이 네트워크에서 보낸 최근 거래. pending인 거래는 열 때마다 receipt를 다시 확인한다
@@ -19,14 +19,9 @@ export function useRecentTxs(network: NetworkConfig, address: string, refreshKey
 
   useEffect(() => {
     let active = true;
-    const pending = listPendingTxs();
-    if (pending.length === 0) return;
-    Promise.all(
-      pending.map(async (tx) => {
-        const { status } = await checkReceipt(NETWORKS[tx.networkId], tx);
-        if (status !== 'pending') updateTxStatus(tx.hash, status);
-      }),
-    ).then(() => active && setChecked((n) => n + 1));
+    refreshPendingTransfers().then((count) => {
+      if (active && count > 0) setChecked((n) => n + 1);
+    });
     return () => {
       active = false;
     };
