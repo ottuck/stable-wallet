@@ -56,6 +56,12 @@ export const AlertIcon = icon(() => (
   </>
 ));
 export const ChevronDownIcon = icon(() => <Path d="M6 9l6 6 6-6" />);
+export const BackspaceIcon = icon(() => (
+  <>
+    <Path d="M9 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6-7 6-7z" />
+    <Path d="M13 10l4 4M17 10l-4 4" />
+  </>
+));
 export const FaceIdIcon = icon(() => (
   <>
     <Path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
