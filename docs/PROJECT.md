@@ -20,7 +20,7 @@
 | 비밀 저장 | expo-secure-store                                | iOS Keychain / Android Keystore                                       |
 | 로컬 DB   | expo-sqlite                                      | 비민감 데이터만                                                       |
 | 상태      | Zustand                                          |                                                                       |
-| 검증      | Zod                                              | 외부 입력(QR, 주소, 금액) 경계에서만                                  |
+| 검증      | Zod(설치만 됨)                                   | 아직 쓰는 곳 없음. 주소·금액은 `core/address`·`core/amount`가 검증    |
 | QR        | react-native-qrcode-svg(생성), expo-camera(스캔) |                                                                       |
 | 인증      | expo-secure-store `requireAuthentication`        | Face ID. 별도 인증 라이브러리 없음                                    |
 | 테스트    | jest-expo                                        | 꼭 필요한 순수 로직만                                                 |
@@ -56,7 +56,7 @@ iOS Keychain은 앱을 지워도 남고 SQLite는 지워진다. SQLite가 새로
 ```text
 src/
 ├── app/            # 화면(Expo Router). 로직은 features/core를 부른다
-├── features/       # 화면 단위 UI·hook: onboarding, home, send, receive, history, i18n(문구·언어)
+├── features/       # 화면 단위 UI·hook: wallet, home, send, history, i18n(문구·언어)
 └── core/           # React를 모르는 지갑 로직
     ├── config/     # networks.ts, tokens.ts
     ├── keys/       # mnemonic 생성·검증·파생, secure-store 접근 (mnemonic을 만지는 유일한 곳)
