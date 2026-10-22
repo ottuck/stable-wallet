@@ -34,10 +34,13 @@ export const colors = {
   danger: '#B42318',
   polygon: '#7B3FE4',
   ethereum: '#627EEA',
+  avalanche: '#E84142',
 };
 
 export function networkColor(nativeSymbol: string): string {
-  return nativeSymbol === 'POL' ? colors.polygon : colors.ethereum;
+  if (nativeSymbol === 'POL') return colors.polygon;
+  if (nativeSymbol === 'AVAX') return colors.avalanche;
+  return colors.ethereum;
 }
 
 export const fonts = {
@@ -197,6 +200,7 @@ const TOKEN_LOGOS: Record<string, number> = {
   USDC: require('@/assets/tokens/usdc.png'),
   POL: require('@/assets/tokens/pol.png'),
   ETH: require('@/assets/tokens/eth.png'),
+  AVAX: require('@/assets/tokens/avax.png'),
   // JPYC 공식 GitHub 조직(github.com/jpycoin) 프로필 이미지
   JPYC: require('@/assets/tokens/jpyc.png'),
 };

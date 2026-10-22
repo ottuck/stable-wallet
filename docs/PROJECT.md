@@ -5,7 +5,7 @@
 
 ## 범위
 
-- 네트워크: Polygon, Ethereum (테스트넷: Polygon Amoy, Ethereum Sepolia)
+- 네트워크: Polygon, Ethereum, Avalanche C-Chain (테스트넷: Polygon Amoy, Ethereum Sepolia, Avalanche Fuji)
 - 자산: USDC, JPYC (ERC-20) + 가스용 native(POL, ETH)
 - 기능: Create, Import(mnemonic), Balance, Send, Receive(주소·QR), QR 스캔, History(앱이 보낸 tx)
 - 계정: mnemonic 하나, 계정 하나(`m/44'/60'/0'/0/0`, MetaMask 첫 계정과 같은 주소)
@@ -68,12 +68,12 @@ src/
 
 ```ts
 type NetworkConfig = {
-  id: 'polygon' | 'ethereum' | 'polygon-amoy' | 'sepolia';
+  id: 'polygon' | 'ethereum' | 'avalanche' | 'polygon-amoy' | 'sepolia' | 'avalanche-fuji';
   chainId: number;
   name: string;
   rpcUrl: string; // 기본은 공개 RPC, EXPO_PUBLIC_RPC_<ID>로 덮어쓴다
   explorerUrl: string;
-  native: { symbol: 'POL' | 'ETH'; decimals: 18 };
+  native: { symbol: 'POL' | 'ETH' | 'AVAX'; decimals: 18 };
   testnet: boolean;
 };
 
@@ -89,7 +89,7 @@ type TokenConfig = {
 
 토큰 주의:
 
-- Polygon USDC는 Circle native USDC만 지원한다. 브릿지된 USDC.e는 지원하지 않고 잔액이 있으면 경고만 한다.
+- Polygon·Avalanche USDC는 Circle native USDC만 지원한다. 브릿지된 USDC.e는 지원하지 않는다(받기 화면에 안내).
 - JPYC는 자금이동업(전자결제수단) JPYC `0xE7C3…3c29`만 쓴다(네 체인 같은 주소, 출처는 `tokens.ts`). 이전 선불식 JPYC `0x431D…7BDB`는 다른 토큰이다.
 - 테스트넷 USDC는 Circle faucet, 테스트넷 JPYC는 같은 주소로 JPYC Faucet(faucet.jpyc.co.jp)에서 받는다.
 
@@ -104,7 +104,7 @@ type TokenConfig = {
 - 토큰 잔액, native 가스 잔액(가스 부족이면 서명 전에 차단)
 - 체인: provider의 chainId가 config와 다르면 `NetworkMismatch`
 
-수수료: EIP-1559. priority fee는 노드의 `eth_maxPriorityFeePerGas`, `maxFeePerGas = baseFee × 2 + priority`, `gasLimit = estimateGas × 1.2`. 값을 하드코딩하지 않는다. 확인 화면에는 서명할 값(to, data, nonce, gasLimit, maxFee, tip, 예상·최대 수수료)을 그대로 보여준다.
+수수료: EIP-1559. priority fee는 노드의 `eth_maxPriorityFeePerGas`, `maxFeePerGas = max(baseFee × 2 + priority, 1 gwei)`(상한만 올라가고 실제 비용은 baseFee + priority), `gasLimit = estimateGas × 1.2`. 값을 하드코딩하지 않는다. 확인 화면에는 서명할 값(to, data, nonce, gasLimit, maxFee, tip, 예상·최대 수수료)을 그대로 보여준다.
 Nonce: `getTransactionCount(address, 'pending')`.
 
 ### Tx 상태

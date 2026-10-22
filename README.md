@@ -2,8 +2,8 @@
 
 A lightweight self-custody EVM stablecoin wallet built with React Native (Expo).
 
-- **Networks**: Polygon, Ethereum (testnets: Polygon Amoy, Sepolia)
-- **Assets**: USDC, JPYC (+ POL / ETH for gas)
+- **Networks**: Polygon, Ethereum, Avalanche (testnets: Polygon Amoy, Sepolia, Avalanche Fuji)
+- **Assets**: USDC, JPYC (+ POL / ETH / AVAX for gas)
 - **Features**: Create / Import, secure local key storage, balance, send / receive, QR, local transaction history
 
 ## Security model
