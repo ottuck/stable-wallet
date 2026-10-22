@@ -14,7 +14,7 @@ import { openExplorer, shortAddress, shortHash } from '@/features/format';
 import { useRecentTxs } from '@/features/history/use-recent-txs';
 import { useBalances } from '@/features/home/use-balances';
 import { useT } from '@/features/i18n';
-import { LanguagePicker } from '@/features/i18n/language-picker';
+import { LanguageSwitch } from '@/features/i18n/language-switch';
 import { ChevronDownIcon, ClockIcon, ReceiveIcon, ScanIcon, SendIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import {
@@ -37,7 +37,7 @@ export default function Home() {
   const styles = useThemed(makeStyles);
   const address = useWallet((s) => s.address)!;
   const { network, setNetwork } = useNetwork();
-  const { balances, transferFee, error, loading, refresh } = useBalances(network, address);
+  const { balances, transferFee, error, refresh } = useBalances(network, address);
   const [refreshKey, setRefreshKey] = useState(0);
   const txs = useRecentTxs(network, address, refreshKey);
 
@@ -92,7 +92,7 @@ export default function Home() {
           <Label bold>{network.name}</Label>
           <ChevronDownIcon size={14} color={c.muted} />
         </Pressable>
-        <RpcStatus loading={loading} failed={error != null} />
+        <LanguageSwitch />
       </View>
 
       <Card style={{ gap: 16 }}>
@@ -160,34 +160,8 @@ export default function Home() {
         )}
       </Card>
 
-      <Card style={{ gap: 10 }}>
-        <Label muted size={12}>
-          {t.common.language}
-        </Label>
-        <LanguagePicker />
-      </Card>
-
       {__DEV__ && <DevTools address={address} />}
     </Screen>
-  );
-}
-
-function RpcStatus({ loading, failed }: { loading: boolean; failed: boolean }) {
-  const c = useColors();
-  const t = useT();
-  const styles = useThemed(makeStyles);
-  const [color, text] = loading
-    ? [c.placeholder, t.home.rpcChecking]
-    : failed
-      ? [c.danger, t.home.rpcFailed]
-      : [c.ok, t.home.rpcOk];
-  return (
-    <View style={styles.status} accessibilityLabel={t.home.rpcLabel(text)}>
-      <View style={[styles.dot, { width: 8, height: 8, backgroundColor: color }]} />
-      <Label muted size={12}>
-        {text}
-      </Label>
-    </View>
   );
 }
 
