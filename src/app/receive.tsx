@@ -65,7 +65,7 @@ export default function Receive() {
             </View>
           ))}
         </View>
-        {network.id === 'polygon' && (
+        {(network.id === 'polygon' || network.id === 'avalanche') && (
           <Label muted size={12} style={{ lineHeight: 18 }}>
             브릿지된 USDC.e는 이 앱에서 지원하지 않습니다. 보내는 쪽에서 USDC(native)인지
             확인하세요.

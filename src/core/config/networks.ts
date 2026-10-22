@@ -1,4 +1,5 @@
-export type NetworkId = 'polygon' | 'ethereum' | 'polygon-amoy' | 'sepolia';
+export type NetworkId =
+  'polygon' | 'ethereum' | 'avalanche' | 'polygon-amoy' | 'sepolia' | 'avalanche-fuji';
 
 export type NetworkConfig = {
   id: NetworkId;
@@ -6,7 +7,7 @@ export type NetworkConfig = {
   name: string;
   rpcUrl: string;
   explorerUrl: string;
-  native: { symbol: 'POL' | 'ETH'; decimals: 18 };
+  native: { symbol: 'POL' | 'ETH' | 'AVAX'; decimals: 18 };
   testnet: boolean;
 };
 
@@ -31,6 +32,15 @@ export const NETWORKS: Record<NetworkId, NetworkConfig> = {
     native: { symbol: 'ETH', decimals: 18 },
     testnet: false,
   },
+  avalanche: {
+    id: 'avalanche',
+    chainId: 43114,
+    name: 'Avalanche',
+    rpcUrl: process.env.EXPO_PUBLIC_RPC_AVALANCHE || 'https://avalanche-c-chain-rpc.publicnode.com',
+    explorerUrl: 'https://snowtrace.io',
+    native: { symbol: 'AVAX', decimals: 18 },
+    testnet: false,
+  },
   'polygon-amoy': {
     id: 'polygon-amoy',
     chainId: 80002,
@@ -48,6 +58,17 @@ export const NETWORKS: Record<NetworkId, NetworkConfig> = {
     rpcUrl: process.env.EXPO_PUBLIC_RPC_SEPOLIA || 'https://ethereum-sepolia-rpc.publicnode.com',
     explorerUrl: 'https://sepolia.etherscan.io',
     native: { symbol: 'ETH', decimals: 18 },
+    testnet: true,
+  },
+  'avalanche-fuji': {
+    id: 'avalanche-fuji',
+    chainId: 43113,
+    name: 'Avalanche Fuji',
+    rpcUrl:
+      process.env.EXPO_PUBLIC_RPC_AVALANCHE_FUJI ||
+      'https://avalanche-fuji-c-chain-rpc.publicnode.com',
+    explorerUrl: 'https://testnet.snowtrace.io',
+    native: { symbol: 'AVAX', decimals: 18 },
     testnet: true,
   },
 };
