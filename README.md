@@ -12,6 +12,19 @@ Henry Wallet is a small, personal wallet for holding and sending stablecoins suc
 
 There is no Henry Wallet service behind the app. Nobody can see your balance, freeze your funds, or send a payment for you — and nobody can recover the wallet for you either, which is why the app asks you to write down a 12-word recovery phrase when you start.
 
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/1-welcome.png" alt="Welcome" width="240" /><br />Welcome</td>
+    <td align="center"><img src="docs/screenshots/2-home.png" alt="Home" width="240" /><br />Home</td>
+    <td align="center"><img src="docs/screenshots/3-send.png" alt="Send" width="240" /><br />Send</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/4-review.png" alt="Review before signing" width="240" /><br />Review before signing</td>
+    <td align="center"><img src="docs/screenshots/5-sent.png" alt="Sent" width="240" /><br />Sent</td>
+    <td align="center"><img src="docs/screenshots/6-receive.png" alt="Receive" width="240" /><br />Receive</td>
+  </tr>
+</table>
+
 ## Highlights
 
 - **Your keys, your money.** The recovery phrase is created on your phone and never leaves it.
