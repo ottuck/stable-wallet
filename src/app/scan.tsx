@@ -5,7 +5,7 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { parseAddressQr } from '@/core/address';
-import { CrossIcon } from '@/features/icons';
+import { CameraIcon, CrossIcon } from '@/features/icons';
 import { useT } from '@/features/i18n';
 import { useNetwork } from '@/features/network-store';
 import { Button, Label, type Palette, useThemed } from '@/features/ui';
@@ -64,15 +64,35 @@ export default function Scan() {
           onBarcodeScanned={onScanned}
         />
       ) : (
-        <View style={[styles.center, { padding: 32, gap: 16 }]}>
-          <Label color="#FFFFFF" style={{ textAlign: 'center', lineHeight: 22 }}>
-            {t.scan.needCamera}
-          </Label>
-          {permission && !permission.canAskAgain ? (
-            <Button title={t.scan.openSettings} onPress={() => void Linking.openSettings()} />
-          ) : (
-            <Button title={t.scan.allowCamera} onPress={() => void requestPermission()} />
-          )}
+        <View style={styles.prompt}>
+          <View style={styles.promptIcon}>
+            <CameraIcon size={34} color="#FFFFFF" strokeWidth={1.8} />
+          </View>
+          <View style={{ gap: 8 }}>
+            <Label bold size={22} color="#FFFFFF" style={styles.promptText}>
+              {t.scan.cameraTitle}
+            </Label>
+            <Label size={15} color="#C9CCD3" style={[styles.promptText, { lineHeight: 22 }]}>
+              {permission && !permission.canAskAgain ? t.scan.cameraBlocked : t.scan.cameraBody}
+            </Label>
+          </View>
+          <View style={styles.promptActions}>
+            {permission && !permission.canAskAgain ? (
+              <Button title={t.scan.openSettings} onPress={() => void Linking.openSettings()} />
+            ) : (
+              <Button title={t.scan.allowCamera} onPress={() => void requestPermission()} />
+            )}
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.back()}
+              hitSlop={10}
+              style={({ pressed }) => [styles.promptLater, pressed && { opacity: 0.6 }]}
+            >
+              <Label bold size={15} color="#C9CCD3">
+                {t.common.close}
+              </Label>
+            </Pressable>
+          </View>
         </View>
       )}
 
@@ -93,14 +113,16 @@ export default function Scan() {
         </Pressable>
       </View>
 
-      <View style={[styles.bottom, { paddingBottom: insets.bottom + 24 }]}>
-        <Label bold color="#FFFFFF" style={{ textAlign: 'center' }}>
-          {t.scan.aim}
-        </Label>
-        <Label size={13} color={message ? '#FFB4A9' : '#C9CCD3'} style={{ textAlign: 'center' }}>
-          {message ?? t.scan.onlyAddresses(network.name)}
-        </Label>
-      </View>
+      {permission?.granted && (
+        <View style={[styles.bottom, { paddingBottom: insets.bottom + 24 }]}>
+          <Label bold color="#FFFFFF" style={{ textAlign: 'center' }}>
+            {t.scan.aim}
+          </Label>
+          <Label size={13} color={message ? '#FFB4A9' : '#C9CCD3'} style={{ textAlign: 'center' }}>
+            {message ?? t.scan.onlyAddresses(network.name)}
+          </Label>
+        </View>
+      )}
     </View>
   );
 }
@@ -117,6 +139,24 @@ const makeStyles = (c: Palette) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
+    prompt: {
+      ...StyleSheet.absoluteFill,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 32,
+      gap: 24,
+    },
+    promptIcon: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: 'rgba(255,255,255,0.12)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    promptText: { textAlign: 'center' },
+    promptActions: { alignSelf: 'stretch', gap: 4 },
+    promptLater: { alignItems: 'center', justifyContent: 'center', minHeight: 48 },
     frame: {
       width: 240,
       height: 240,

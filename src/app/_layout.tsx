@@ -7,11 +7,20 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { HomeBack } from '@/features/home-back';
 import { useT } from '@/features/i18n';
 import { useColors } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
 void SplashScreen.preventAutoHideAsync();
+
+/** 앞 화면이 없으면(웹 새로고침 등) 뒤로 가기 대신 홈으로 가는 버튼을 보인다 */
+const withHomeBack =
+  (title: string) =>
+  ({ navigation }: { navigation: { canGoBack: () => boolean } }) => ({
+    title,
+    headerLeft: navigation.canGoBack() ? undefined : () => <HomeBack />,
+  });
 
 export default function RootLayout() {
   const c = useColors();
@@ -43,13 +52,13 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShadowVisible: false }}>
         <Stack.Protected guard={status === 'ready'}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="send" options={{ title: t.nav.send }} />
-          <Stack.Screen name="send-review" options={{ title: t.nav.review }} />
+          <Stack.Screen name="send" options={withHomeBack(t.nav.send)} />
+          <Stack.Screen name="send-review" options={withHomeBack(t.nav.review)} />
           <Stack.Screen
             name="send-status"
             options={{ headerShown: false, gestureEnabled: false }}
           />
-          <Stack.Screen name="receive" options={{ title: t.nav.receive }} />
+          <Stack.Screen name="receive" options={withHomeBack(t.nav.receive)} />
           <Stack.Screen
             name="scan"
             options={{ headerShown: false, presentation: 'fullScreenModal' }}

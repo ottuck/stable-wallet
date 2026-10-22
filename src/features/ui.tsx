@@ -100,11 +100,14 @@ export function Screen({
   children,
   footer,
   onRefresh,
+  fill,
 }: {
   children: ReactNode;
   footer?: ReactNode;
   /** 당겨서 새로고침 */
   onRefresh?: () => void;
+  /** 남는 세로 공간을 flex: 1인 자식이 채우게 한다(내용이 길면 평소처럼 스크롤) */
+  fill?: boolean;
 }) {
   const c = useColors();
   const styles = useThemed(makeStyles);
@@ -118,7 +121,7 @@ export function Screen({
       {/* 헤더가 반투명(iOS)이라 inset을 자동으로 맞춰 내용이 헤더 밑에 깔리지 않게 한다 */}
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={styles.screen}
+        contentContainerStyle={fill ? [styles.screen, { flexGrow: 1 }] : styles.screen}
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
