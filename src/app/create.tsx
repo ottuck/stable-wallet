@@ -46,7 +46,10 @@ export default function Create() {
   // 저장 중에 찍힌 스크린샷도 알 수 있게 지금 보이는 문구를 ref로 따라간다
   const currentDraft = useRef(draft);
   const [step, setStep] = useState<'write' | 'verify'>('write');
-  const quiz = useMemo(() => makeQuiz(draft.phrase), [draft]);
+  // 문구를 다시 보러 갔다 오면 질문 위치를 새로 뽑는다(한 번 외운 답을 재사용하지 못하게)
+  const [round, setRound] = useState(0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const quiz = useMemo(() => makeQuiz(draft.phrase), [draft, round]);
   const [picked, setPicked] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -138,7 +141,10 @@ export default function Create() {
           <Button title={t.create.createWallet} busy={busy} disabled={!correct} onPress={confirm} />
           <Pressable
             accessibilityRole="button"
-            onPress={() => setStep('write')}
+            onPress={() => {
+              setRound((r) => r + 1);
+              setStep('write');
+            }}
             style={styles.back}
           >
             <Label bold size={14} color={c.accent}>
