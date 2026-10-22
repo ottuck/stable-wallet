@@ -4,6 +4,8 @@ import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 import { useColors } from '@/features/ui';
 
+import { DemoLayer } from './overlay';
+
 const W = 390;
 const H = 844;
 const BEZEL = 12;
@@ -15,7 +17,7 @@ export function PhoneFrame({ children }: PropsWithChildren) {
   const c = useColors();
   const dark = useColorScheme() === 'dark';
   const win = useWindowDimensions();
-  if (Platform.OS !== 'web' || win.width < 520) return <>{children}</>;
+  if (Platform.OS !== 'web' || win.width < 520) return <DemoLayer>{children}</DemoLayer>;
 
   const scale = Math.min(1, (win.height - CAPTION * 2) / (H + BEZEL * 2));
   const ink = dark ? '#FFFFFF' : '#0F1115';
@@ -52,7 +54,7 @@ export function PhoneFrame({ children }: PropsWithChildren) {
         >
           {/* 웹에는 safe area가 없어 틀의 홈 인디케이터만큼 아래를 비운다 */}
           <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 24, left: 0, right: 0 }}>
-            {children}
+            <DemoLayer>{children}</DemoLayer>
           </SafeAreaInsetsContext.Provider>
 
           <View

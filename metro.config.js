@@ -17,7 +17,7 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     if (root) return { type: 'sourceFile', filePath: path.join(root[1], 'crypto.js') };
   }
   const resolution = (defaultResolve ?? context.resolveRequest)(context, moduleName, platform);
-  return demo ? demo.redirect(moduleName, resolution) : resolution;
+  return demo ? demo.redirect(moduleName, resolution, context.originModulePath) : resolution;
 };
 
 module.exports = config;

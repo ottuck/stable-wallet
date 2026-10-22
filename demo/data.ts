@@ -1,12 +1,24 @@
-import { keccak256, toUtf8Bytes } from 'ethers';
+import { keccak256, Mnemonic, toUtf8Bytes } from 'ethers';
 
 /**
  * 데모(전시)에서 보이는 가짜 값은 모두 여기 둔다. 값을 바꿔 보여주고 싶으면 이 파일만 고친다.
  * 실제 앱 코드·실제 자산과는 상관없다.
  */
 export const DEMO = {
+  /**
+   * 데모 지갑의 복구 문구. 공개 사이트라 무작위로 만들지 않고 누구나 아는 고정 문구를 쓴다
+   * (새 지갑·가져오기·처음부터 있는 지갑 모두 이 문구다). 이 주소로 받은 돈은 누구든 가져갈 수 있다.
+   */
+  phrase: Mnemonic.fromEntropy(keccak256(toUtf8Bytes('henry-wallet-demo')).slice(0, 34)).phrase,
+
+  /** 붙여넣기·QR 스캔이 채워 주는 받는 주소(EIP-55 예시 주소) */
+  recipient: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
+
+  /** 받기 화면 QR에 담는 글. 주소가 아니라서 찍어도 어느 지갑도 송금 주소로 받지 않는다 */
+  qrText: 'Henry Wallet demo - not a real address. Do not send funds.',
+
   /** ms. 네트워크 응답, Face ID 서명, 블록 확정을 기다리는 시간 */
-  latency: { rpc: 400, sign: 700, confirm: 5000 },
+  latency: { rpc: 400, sign: 1100, confirm: 5000 },
 
   /** 지갑을 열 때 보이는 잔액(사람이 읽는 단위). 네트워크마다 같은 값으로 시작한다. */
   balances: { native: '0.42', USDC: '1284.56', JPYC: '48200' } as Record<string, string>,
