@@ -1,9 +1,8 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { ActionSheetIOS, Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { formatAmount } from '@/core/amount';
-import { activeNetworks } from '@/core/config/networks';
 import { tokensOn } from '@/core/config/tokens';
 import type { AssetBalance } from '@/core/evm/balances';
 import type { WalletTx } from '@/core/history';
@@ -13,10 +12,11 @@ import { CopyButton } from '@/features/copy-button';
 import { errorMessage } from '@/features/error-message';
 import { openExplorer, shortAddress, shortHash } from '@/features/format';
 import { useRecentTxs } from '@/features/history/use-recent-txs';
+import { MENU_LAYER, NetworkPicker } from '@/features/home/network-picker';
 import { useBalances } from '@/features/home/use-balances';
 import { useT } from '@/features/i18n';
 import { LanguageSwitch } from '@/features/i18n/language-switch';
-import { ChevronDownIcon, ClockIcon, ReceiveIcon, ScanIcon, SendIcon } from '@/features/icons';
+import { ClockIcon, ReceiveIcon, ScanIcon, SendIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import {
   Address,
@@ -37,7 +37,7 @@ export default function Home() {
   const t = useT();
   const styles = useThemed(makeStyles);
   const address = useWallet((s) => s.address)!;
-  const { network, setNetwork } = useNetwork();
+  const network = useNetwork((s) => s.network);
   const { balances, transferFee, error, refresh } = useBalances(network, address);
   const [refreshKey, setRefreshKey] = useState(0);
   const txs = useRecentTxs(network, address, refreshKey);
@@ -58,21 +58,6 @@ export default function Home() {
     }, []),
   );
 
-  function pickNetwork() {
-    if (Platform.OS !== 'ios') {
-      const i = activeNetworks.findIndex((n) => n.id === network.id);
-      setNetwork(activeNetworks[(i + 1) % activeNetworks.length]);
-      return;
-    }
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: [...activeNetworks.map((n) => n.name), t.common.cancel],
-        cancelButtonIndex: activeNetworks.length,
-      },
-      (i) => i < activeNetworks.length && setNetwork(activeNetworks[i]),
-    );
-  }
-
   // 스테이블코인은 큰 잔액으로, 가스용 native는 따로
   const native = balances?.find((b) => !b.tokenAddress);
   const stables = tokensOn(network.id).map((token) => ({
@@ -82,17 +67,8 @@ export default function Home() {
 
   return (
     <Screen onRefresh={reload}>
-      <View style={styles.topRow}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t.home.networkLabel(network.name)}
-          onPress={pickNetwork}
-          style={styles.networkButton}
-        >
-          <View style={[styles.dot, { backgroundColor: networkColor(network.native.symbol) }]} />
-          <Label bold>{network.name}</Label>
-          <ChevronDownIcon size={14} color={c.muted} />
-        </Pressable>
+      <View style={[styles.topRow, MENU_LAYER]}>
+        <NetworkPicker />
         <LanguageSwitch />
       </View>
 
@@ -366,19 +342,6 @@ function DevTools({ address }: { address: string }) {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    networkButton: {
-      minHeight: 44,
-      paddingLeft: 12,
-      paddingRight: 14,
-      borderRadius: 22,
-      borderWidth: 1,
-      borderColor: c.border,
-      backgroundColor: c.card,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-    },
-    dot: { width: 10, height: 10, borderRadius: 5 },
     status: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     addressRow: {
       flexDirection: 'row',
