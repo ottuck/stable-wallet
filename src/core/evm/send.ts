@@ -15,6 +15,11 @@ import type { TxStatus } from '../history';
 import { ERC20_ABI, getProvider } from './balances';
 
 const ERC20 = new Interface(ERC20_ABI);
+const MIN_MAX_FEE_PER_GAS = 1_000_000_000n; // 1 gwei
+
+function max(a: bigint, b: bigint): bigint {
+  return a > b ? a : b;
+}
 
 /** to는 parseRecipient로 검증한 체크섬 주소, amount는 raw 단위. */
 export type SendRequest = {
@@ -96,7 +101,9 @@ export async function prepareSend(req: SendRequest): Promise<SendPreview> {
     throw new WalletError('GasEstimationFailed', { cause });
   }
   const gasLimit = (gasEstimate * 120n) / 100n;
-  const maxFeePerGas = baseFee * 2n + priorityFee;
+  // 상한(maxFee)을 올려도 실제로 내는 건 baseFee + tip이라 비용은 같다. baseFee가 몇 wei인 체인
+  // (Sepolia·Fuji)에서 상한이 너무 낮아 tx가 멈추지 않도록 최소 1 gwei로 둔다.
+  const maxFeePerGas = max(baseFee * 2n + priorityFee, MIN_MAX_FEE_PER_GAS);
   return {
     ...preview,
     gasLimit,
