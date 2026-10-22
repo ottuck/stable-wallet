@@ -189,8 +189,11 @@ export default function SendInput() {
             accessibilityLabel={`${t.send.amountLabel}: ${amountShown} ${token.symbol}`}
             accessibilityLiveRegion="polite"
             numberOfLines={1}
+            // 좁은 기기에서도 한 줄에 다 보이게 남은 폭에 맞춰 줄인다
+            adjustsFontSizeToFit
+            minimumFontScale={0.5}
             color={overBalance ? c.danger : amountText === '' ? c.placeholder : c.text}
-            style={{ fontSize: amountFontSize(amountShown.length) }}
+            style={{ fontSize: amountFontSize(amountShown.length), flexShrink: 1 }}
           >
             {amountShown}
           </Label>
