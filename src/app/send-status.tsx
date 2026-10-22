@@ -8,7 +8,16 @@ import { updateTxStatus } from '@/core/history';
 import { formatTime, openExplorer, shortAddress, shortHash } from '@/features/format';
 import { AlertIcon, CheckIcon, ClockIcon } from '@/features/icons';
 import { useSendFlow } from '@/features/send/store';
-import { Button, Card, colors, Label, Screen, TokenIcon } from '@/features/ui';
+import {
+  Button,
+  Card,
+  Label,
+  type Palette,
+  Screen,
+  TokenIcon,
+  useColors,
+  useThemed,
+} from '@/features/ui';
 
 const HEADLINE = {
   pending: '블록 포함을 기다리는 중',
@@ -18,6 +27,8 @@ const HEADLINE = {
 };
 
 export default function SendStatus() {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const p = useSendFlow((s) => s.preview);
   const sent = useSendFlow((s) => s.sent);
   const [result, setResult] = useState<ReceiptResult>({ status: 'pending' });
@@ -37,8 +48,7 @@ export default function SendStatus() {
   if (!p || !sent) return null;
   const native = p.network.native;
   const { status, fee } = result;
-  const tone =
-    status === 'confirmed' ? colors.accent : status === 'pending' ? colors.warn : colors.danger;
+  const tone = status === 'confirmed' ? c.ok : status === 'pending' ? c.warn : c.danger;
 
   function home() {
     useSendFlow.getState().reset();
@@ -101,15 +111,15 @@ export default function SendStatus() {
           last
           done={status === 'confirmed'}
           failed={status === 'failed' || status === 'dropped'}
-          title="블록 포함 · receipt"
+          title="블록에 포함"
           detail={
             status === 'pending'
               ? sent.uncertain
                 ? '전송 응답을 받지 못했어요. 네트워크에 올라갔는지 이어서 확인합니다. 다시 보내기 전에 홈에서 상태를 확인하세요.'
                 : '보통 몇 초 걸려요. 앱을 닫아도 다음에 열 때 이어서 확인합니다.'
               : status === 'confirmed'
-                ? 'status 1'
-                : 'status 0 · 토큰은 나가지 않았고 수수료만 냈습니다'
+                ? '성공했습니다 (status 1)'
+                : '실패했습니다 (status 0) · 토큰은 나가지 않았고 수수료만 냈습니다'
           }
           time={status === 'pending' ? '대기' : ''}
         />
@@ -132,7 +142,7 @@ export default function SendStatus() {
           muted={fee === undefined}
           v={
             fee === undefined
-              ? 'receipt 후 표시'
+              ? '확정 후 표시'
               : `${formatAmount(fee, native.decimals, 6)} ${native.symbol}`
           }
         />
@@ -142,6 +152,7 @@ export default function SendStatus() {
 }
 
 function Info({ k, v, mono, muted }: { k: string; v: string; mono?: boolean; muted?: boolean }) {
+  const styles = useThemed(makeStyles);
   return (
     <View style={styles.row}>
       <Label muted size={13} style={{ width: 96 }}>
@@ -171,7 +182,9 @@ function Step({
   last?: boolean;
   onPress?: () => void;
 }) {
-  const color = failed ? colors.danger : done ? colors.accent : colors.warn;
+  const c = useColors();
+  const styles = useThemed(makeStyles);
+  const color = failed ? c.danger : done ? c.ok : c.warn;
   return (
     <View style={styles.step}>
       <View style={styles.rail}>
@@ -180,22 +193,20 @@ function Step({
             styles.node,
             done || failed
               ? { backgroundColor: color }
-              : { borderWidth: 2.5, borderColor: color, backgroundColor: colors.card },
+              : { borderWidth: 2.5, borderColor: color, backgroundColor: c.card },
           ]}
         >
           {done && <CheckIcon size={12} color="#FFFFFF" strokeWidth={3.5} />}
         </View>
-        {!last && (
-          <View style={[styles.line, { backgroundColor: done ? colors.accent : colors.border }]} />
-        )}
+        {!last && <View style={[styles.line, { backgroundColor: done ? c.ok : c.border }]} />}
       </View>
       <View style={{ flex: 1, gap: 2, paddingBottom: last ? 0 : 14 }}>
-        <Label bold color={done ? colors.text : color}>
+        <Label bold color={done ? c.text : color}>
           {title}
         </Label>
         {onPress ? (
           <Pressable accessibilityRole="link" onPress={onPress} hitSlop={8}>
-            <Label mono size={12} color={colors.accent}>{`${detail} ↗`}</Label>
+            <Label mono size={12} color={c.accent}>{`${detail} ↗`}</Label>
           </Pressable>
         ) : (
           <Label muted size={12}>
@@ -210,25 +221,32 @@ function Step({
   );
 }
 
-const styles = StyleSheet.create({
-  hero: { alignItems: 'center', gap: 10, paddingTop: 40, paddingBottom: 8 },
-  badge: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  step: { flexDirection: 'row', gap: 12 },
-  rail: { alignItems: 'center', width: 20 },
-  node: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  line: { flex: 1, width: 2, minHeight: 20 },
-  explorer: {
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    hero: { alignItems: 'center', gap: 10, paddingTop: 40, paddingBottom: 8 },
+    badge: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    step: { flexDirection: 'row', gap: 12 },
+    rail: { alignItems: 'center', width: 20 },
+    node: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    line: { flex: 1, width: 2, minHeight: 20 },
+    explorer: {
+      height: 52,
+      borderRadius: 16,
+      backgroundColor: c.card,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });

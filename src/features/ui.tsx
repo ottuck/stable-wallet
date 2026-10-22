@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useColorScheme,
   View,
   type StyleProp,
   type TextProps,
@@ -16,31 +17,64 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// D안(투명한 거래) 토큰. 밝은 테마 하나만 쓴다.
-export const colors = {
+// D안(투명한 거래) 토큰. 시스템 설정을 따라 밝은/어두운 테마를 쓴다.
+// primary는 흰 글자를 얹는 채움색, accent는 어두운/밝은 바탕 위의 링크·아이콘색이다.
+const light = {
   bg: '#F4F5F7',
   card: '#FFFFFF',
   soft: '#F7F8FA',
+  segment: '#E9EBEF',
   text: '#0F1115',
   muted: '#5A606B',
   line: '#EEF0F2',
   border: '#E4E6EA',
   placeholder: '#B8BDC6',
+  primary: '#2F5BEA',
+  onPrimary: '#FFFFFF',
   accent: '#2F5BEA',
   accentText: '#1E3FB0',
   accentSoft: '#EAF0FF',
   warn: '#8A4500',
+  warnText: '#5C2E00',
+  warnSoft: '#FFF3E5',
   ok: '#1F8A5B',
+  okSoft: '#E4F5EC',
   danger: '#B42318',
-  polygon: '#7B3FE4',
-  ethereum: '#627EEA',
-  avalanche: '#E84142',
+  dangerSoft: '#FDECEA',
 };
 
+const dark: typeof light = {
+  bg: '#0B0D12',
+  card: '#151922',
+  soft: '#1C212B',
+  segment: '#10131A',
+  text: '#F2F4F7',
+  muted: '#9AA1AD',
+  line: '#222833',
+  border: '#2B323E',
+  placeholder: '#5B6270',
+  primary: '#3F66E8',
+  onPrimary: '#FFFFFF',
+  accent: '#7C9DFF',
+  accentText: '#A9C0FF',
+  accentSoft: '#1B2748',
+  warn: '#F5A64A',
+  warnText: '#FFD9A8',
+  warnSoft: '#2E2112',
+  ok: '#3CC68A',
+  okSoft: '#10281F',
+  danger: '#FF7A6B',
+  dangerSoft: '#33171A',
+};
+
+export type Palette = typeof light;
+
+const networkColors = { polygon: '#7B3FE4', ethereum: '#627EEA', avalanche: '#E84142' };
+
 export function networkColor(nativeSymbol: string): string {
-  if (nativeSymbol === 'POL') return colors.polygon;
-  if (nativeSymbol === 'AVAX') return colors.avalanche;
-  return colors.ethereum;
+  if (nativeSymbol === 'POL') return networkColors.polygon;
+  if (nativeSymbol === 'AVAX') return networkColors.avalanche;
+  return networkColors.ethereum;
 }
 
 export const fonts = {
@@ -48,10 +82,18 @@ export const fonts = {
   monoBold: 'IBMPlexMono_600SemiBold',
 };
 
-/** 이전 화면들과 맞추기 위한 별칭 */
-export function useColors() {
-  return colors;
+export function useColors(): Palette {
+  return useColorScheme() === 'dark' ? dark : light;
 }
+
+/** 테마가 바뀔 때만 스타일을 다시 만든다. make는 모듈 최상위 함수로 둔다. */
+export function useThemed<T>(make: (c: Palette) => T): T {
+  const c = useColors();
+  return useMemo(() => make(c), [make, c]);
+}
+
+/** 글자 크기를 키운 사용자에게도 레이아웃이 깨지지 않게 상한을 둔다. */
+export const MAX_FONT_SCALE = 1.3;
 
 /** footer는 스크롤과 별개로 화면 아래에 붙는다(주 버튼 자리). */
 export function Screen({
@@ -64,12 +106,14 @@ export function Screen({
   /** 당겨서 새로고침 */
   onRefresh?: () => void;
 }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const insets = useSafeAreaInsets();
   return (
     // 숫자 키패드에는 닫기 키가 없어 하단 버튼이 키보드에 가린다 → 키보드만큼 올린다
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1, backgroundColor: colors.bg }}
+      style={{ flex: 1, backgroundColor: c.bg }}
     >
       {/* 헤더가 반투명(iOS)이라 inset을 자동으로 맞춰 내용이 헤더 밑에 깔리지 않게 한다 */}
       <ScrollView
@@ -94,6 +138,7 @@ export function Screen({
 }
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const styles = useThemed(makeStyles);
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
@@ -106,11 +151,13 @@ type LabelProps = TextProps & {
 };
 
 export function Label({ muted, mono, bold, size, color, style, ...props }: LabelProps) {
+  const c = useColors();
   return (
     <Text
+      maxFontSizeMultiplier={MAX_FONT_SCALE}
       style={[
         {
-          color: color ?? (muted ? colors.muted : colors.text),
+          color: color ?? (muted ? c.muted : c.text),
           fontSize: size ?? (mono ? 14 : 15),
           fontWeight: bold ? '700' : '400',
         },
@@ -137,7 +184,9 @@ export function Button({
   secondary?: boolean;
   icon?: ReactNode;
 }) {
-  const fg = secondary ? colors.accentText : '#FFFFFF';
+  const c = useColors();
+  const styles = useThemed(makeStyles);
+  const fg = secondary ? c.accentText : c.onPrimary;
   const inactive = busy || disabled;
   return (
     <Pressable
@@ -148,7 +197,7 @@ export function Button({
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: secondary ? colors.accentSoft : colors.accent,
+          backgroundColor: secondary ? c.accentSoft : c.primary,
           opacity: disabled ? 0.4 : pressed || busy ? 0.7 : 1,
         },
       ]}
@@ -158,7 +207,12 @@ export function Button({
       ) : (
         <>
           {icon}
-          <Text style={{ color: fg, fontSize: 16, fontWeight: '600' }}>{title}</Text>
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SCALE}
+            style={{ color: fg, fontSize: 16, fontWeight: '600' }}
+          >
+            {title}
+          </Text>
         </>
       )}
     </Pressable>
@@ -178,6 +232,8 @@ export function IconButton({
   filled?: boolean;
   disabled?: boolean;
 }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   return (
     <Pressable
       accessibilityRole="button"
@@ -188,7 +244,7 @@ export function IconButton({
       hitSlop={4}
       style={({ pressed }) => [
         styles.iconButton,
-        { backgroundColor: filled ? colors.soft : 'transparent', opacity: pressed ? 0.6 : 1 },
+        { backgroundColor: filled ? c.soft : 'transparent', opacity: pressed ? 0.6 : 1 },
       ]}
     >
       {children}
@@ -207,6 +263,8 @@ const TOKEN_LOGOS: Record<string, number> = {
 
 /** 로고가 없는 토큰은 점선 자리 표시. */
 export function TokenIcon({ symbol, size = 36 }: { symbol: string; size?: number }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const logo = TOKEN_LOGOS[symbol];
   const box = { width: size, height: size, borderRadius: size / 2 };
   if (logo) {
@@ -214,7 +272,7 @@ export function TokenIcon({ symbol, size = 36 }: { symbol: string; size?: number
       <Image
         source={logo}
         accessibilityLabel={symbol}
-        style={[box, symbol === 'POL' && { borderWidth: 1, borderColor: colors.line }]}
+        style={[box, symbol === 'POL' && { borderWidth: 1, borderColor: c.line }]}
       />
     );
   }
@@ -223,7 +281,7 @@ export function TokenIcon({ symbol, size = 36 }: { symbol: string; size?: number
       accessibilityLabel={symbol}
       style={[box, styles.tokenPlaceholder, { borderWidth: size > 24 ? 1.5 : 1 }]}
     >
-      <Text style={{ color: colors.muted, fontSize: size * 0.38 }}>?</Text>
+      <Text style={{ color: c.muted, fontSize: size * 0.38 }}>?</Text>
     </View>
   );
 }
@@ -238,12 +296,14 @@ export function Address({
   short?: boolean;
   size?: number;
 }) {
+  const c = useColors();
   const head = value.slice(0, 6);
   const tail = value.slice(-4);
   const middle = short ? '…' : value.slice(6, -4);
   return (
     <Text
-      style={{ fontFamily: fonts.mono, fontSize: size, color: colors.text, lineHeight: size * 1.5 }}
+      maxFontSizeMultiplier={MAX_FONT_SCALE}
+      style={{ fontFamily: fonts.mono, fontSize: size, color: c.text, lineHeight: size * 1.5 }}
     >
       <Text style={{ fontFamily: fonts.monoBold }}>{head}</Text>
       {middle}
@@ -253,32 +313,35 @@ export function Address({
 }
 
 export function Divider() {
-  return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: colors.border }} />;
+  const c = useColors();
+  return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: c.border }} />;
 }
 
-const styles = StyleSheet.create({
-  screen: { padding: 16, gap: 14 },
-  footer: { paddingHorizontal: 16, paddingTop: 12, gap: 10, backgroundColor: colors.bg },
-  card: { backgroundColor: colors.card, borderRadius: 20, padding: 18, gap: 10 },
-  button: {
-    height: 56,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 10,
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tokenPlaceholder: {
-    borderStyle: 'dashed',
-    borderColor: colors.placeholder,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    screen: { padding: 16, gap: 14 },
+    footer: { paddingHorizontal: 16, paddingTop: 12, gap: 10, backgroundColor: c.bg },
+    card: { backgroundColor: c.card, borderRadius: 20, padding: 18, gap: 10 },
+    button: {
+      minHeight: 56,
+      paddingVertical: 8,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      gap: 10,
+    },
+    iconButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tokenPlaceholder: {
+      borderStyle: 'dashed',
+      borderColor: c.placeholder,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });

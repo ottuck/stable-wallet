@@ -1,6 +1,6 @@
 import { router, Stack } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { formatAmount } from '@/core/amount';
 import { WalletError } from '@/core/errors';
@@ -9,22 +9,27 @@ import { saveTx, updateTxStatus } from '@/core/history';
 import { withSigner } from '@/core/keys/vault';
 import { errorMessage } from '@/features/error-message';
 import { formatGwei, shortAddress } from '@/features/format';
-import { AlertIcon, CheckIcon, FaceIdIcon } from '@/features/icons';
+import { AlertIcon, CheckIcon, ChevronDownIcon, FaceIdIcon } from '@/features/icons';
 import { useSendFlow } from '@/features/send/store';
 import {
   Address,
   Button,
   Card,
-  colors,
   Label,
   networkColor,
+  type Palette,
   Screen,
   TokenIcon,
+  useColors,
+  useThemed,
 } from '@/features/ui';
 
 export default function SendReview() {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const p = useSendFlow((s) => s.preview);
   const [busy, setBusy] = useState(false);
+  const [showRaw, setShowRaw] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!p) return null;
@@ -33,7 +38,7 @@ export default function SendReview() {
   const gasOk = hasGasBalance(p);
   const checks: { label: string; ok: boolean; detail?: string }[] = [
     // 입력 화면에서 parseRecipient를 통과한 주소만 여기에 온다
-    { label: '주소 체크섬(EIP-55)', ok: true },
+    { label: '주소 형식·체크섬', ok: true },
     { label: '토큰 컨트랙트로 보내지 않음', ok: true },
     {
       label: `${p.token.symbol} 잔액`,
@@ -48,9 +53,9 @@ export default function SendReview() {
           ? '계산 안 됨'
           : `${formatAmount(p.nativeBalance, native.decimals, 4)} ≥ ${formatAmount(p.maxFee, native.decimals, 4)}`,
     },
-    { label: 'RPC 체인', ok: true, detail: String(p.network.chainId) },
+    { label: '네트워크(체인 ID)', ok: true, detail: String(p.network.chainId) },
   ];
-  const passed = checks.filter((c) => c.ok).length;
+  const passed = checks.filter((check) => check.ok).length;
 
   async function send() {
     if (!p) return;
@@ -94,13 +99,13 @@ export default function SendReview() {
       footer={
         <>
           {error && (
-            <Label size={13} color={colors.danger}>
+            <Label size={13} color={c.danger}>
               {error}
             </Label>
           )}
           <Button
             title="Face ID로 서명하고 보내기"
-            icon={<FaceIdIcon size={20} color="#FFFFFF" />}
+            icon={<FaceIdIcon size={20} color={c.onPrimary} />}
             busy={busy}
             disabled={!tokenOk || !gasOk}
             onPress={() => void send()}
@@ -150,76 +155,93 @@ export default function SendReview() {
         <Label bold muted size={12}>
           {`검증 ${passed}/${checks.length}`}
         </Label>
-        {checks.map((c) => (
-          <View key={c.label} style={styles.between}>
+        {checks.map((check) => (
+          <View key={check.label} style={styles.between}>
             <View style={styles.check}>
-              {c.ok ? (
-                <CheckIcon size={16} color={colors.accent} strokeWidth={3} />
+              {check.ok ? (
+                <CheckIcon size={16} color={c.ok} strokeWidth={3} />
               ) : (
-                <AlertIcon size={16} color={colors.danger} strokeWidth={2.4} />
+                <AlertIcon size={16} color={c.danger} strokeWidth={2.4} />
               )}
-              <Label size={13} color={c.ok ? colors.text : colors.danger}>
-                {c.label}
+              <Label size={13} color={check.ok ? c.text : c.danger}>
+                {check.label}
               </Label>
             </View>
-            {c.detail && (
+            {check.detail && (
               <Label mono muted size={12}>
-                {c.detail}
+                {check.detail}
               </Label>
             )}
           </View>
         ))}
       </Card>
 
-      <Card style={{ gap: 8 }}>
+      <Card style={{ gap: 10 }}>
+        <Label bold muted size={12}>
+          수수료
+        </Label>
         <View style={styles.between}>
+          <Label size={13}>예상</Label>
+          <Label mono size={13}>
+            {p.estimatedFee === null
+              ? '—'
+              : `≈ ${formatAmount(p.estimatedFee, native.decimals, 6)} ${native.symbol}`}
+          </Label>
+        </View>
+        <View style={styles.between}>
+          <Label size={13}>최대</Label>
+          <Label mono size={13}>
+            {p.maxFee === null
+              ? '—'
+              : `${formatAmount(p.maxFee, native.decimals, 6)} ${native.symbol}`}
+          </Label>
+        </View>
+      </Card>
+
+      <Card style={{ gap: 12 }}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ expanded: showRaw }}
+          onPress={() => setShowRaw((v) => !v)}
+          hitSlop={8}
+          style={styles.between}
+        >
           <Label bold muted size={12}>
-            트랜잭션
+            서명할 트랜잭션 상세 (EIP-1559)
           </Label>
-          <Label muted size={12}>
-            EIP-1559
-          </Label>
-        </View>
-        <View style={styles.raw}>
-          <Raw k="to" v={`${shortAddress(p.token.address)} ${p.token.symbol}`} />
-          <Raw k="data" v={`transfer(${shortAddress(p.to)}, ${p.amount})`} />
-          <Raw k="value" v="0" />
-          <Raw k="nonce" v={String(p.nonce)} />
-          <Raw
-            k="gasLimit"
-            v={p.gasLimit === null ? '—' : `${p.gasLimit.toLocaleString()} (+20%)`}
-          />
-          <Raw
-            k="maxFee"
-            v={p.maxFeePerGas === null ? '—' : `${formatGwei(p.maxFeePerGas)} gwei`}
-          />
-          <Raw
-            k="tip"
-            v={p.maxPriorityFeePerGas === null ? '—' : `${formatGwei(p.maxPriorityFeePerGas)} gwei`}
-          />
-          <Raw
-            k="예상 수수료"
-            v={
-              p.estimatedFee === null
-                ? '—'
-                : `≈ ${formatAmount(p.estimatedFee, native.decimals, 6)} ${native.symbol}`
-            }
-          />
-          <Raw
-            k="최대 수수료"
-            v={
-              p.maxFee === null
-                ? '—'
-                : `${formatAmount(p.maxFee, native.decimals, 6)} ${native.symbol}`
-            }
-          />
-        </View>
+          <View style={{ transform: [{ rotate: showRaw ? '180deg' : '0deg' }] }}>
+            <ChevronDownIcon size={16} color={c.muted} />
+          </View>
+        </Pressable>
+        {showRaw && (
+          <View style={styles.raw}>
+            <Raw k="to" v={`${shortAddress(p.token.address)} ${p.token.symbol}`} />
+            <Raw k="data" v={`transfer(${shortAddress(p.to)}, ${p.amount})`} />
+            <Raw k="value" v="0" />
+            <Raw k="nonce" v={String(p.nonce)} />
+            <Raw
+              k="gasLimit"
+              v={p.gasLimit === null ? '—' : `${p.gasLimit.toLocaleString()} (+20%)`}
+            />
+            <Raw
+              k="maxFee"
+              v={p.maxFeePerGas === null ? '—' : `${formatGwei(p.maxFeePerGas)} gwei`}
+            />
+            <Raw
+              k="tip"
+              v={
+                p.maxPriorityFeePerGas === null ? '—' : `${formatGwei(p.maxPriorityFeePerGas)} gwei`
+              }
+            />
+          </View>
+        )}
       </Card>
     </Screen>
   );
 }
 
 function Raw({ k, v }: { k: string; v: string }) {
+  const styles = useThemed(makeStyles);
   return (
     <View style={styles.rawRow}>
       <Label mono muted size={12} style={{ width: 84 }}>
@@ -232,14 +254,15 @@ function Raw({ k, v }: { k: string; v: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  amount: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  network: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  dot: { width: 8, height: 8, borderRadius: 4 },
-  party: { flexDirection: 'row' },
-  partyLabel: { width: 44, paddingTop: 2 },
-  check: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  raw: { backgroundColor: colors.soft, borderRadius: 12, padding: 12, gap: 4 },
-  rawRow: { flexDirection: 'row' },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    amount: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    network: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    dot: { width: 8, height: 8, borderRadius: 4 },
+    party: { flexDirection: 'row' },
+    partyLabel: { width: 44, paddingTop: 2 },
+    check: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    raw: { backgroundColor: c.soft, borderRadius: 12, padding: 12, gap: 4 },
+    rawRow: { flexDirection: 'row' },
+  });

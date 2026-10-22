@@ -5,10 +5,22 @@ import { tokensOn } from '@/core/config/tokens';
 import { CopyButton } from '@/features/copy-button';
 import { AlertIcon, ShareIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
-import { Address, Card, colors, IconButton, Label, Screen, TokenIcon } from '@/features/ui';
+import {
+  Address,
+  Card,
+  IconButton,
+  Label,
+  type Palette,
+  Screen,
+  TokenIcon,
+  useColors,
+  useThemed,
+} from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
 export default function Receive() {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const address = useWallet((s) => s.address)!;
   const network = useNetwork((s) => s.network);
   const assets = [network.native.symbol, ...tokensOn(network.id).map((t) => t.symbol)];
@@ -16,9 +28,9 @@ export default function Receive() {
   return (
     <Screen>
       <View style={styles.warning}>
-        <AlertIcon size={18} color={colors.warn} />
-        <Label size={13} color="#5C2E00" style={{ flex: 1, lineHeight: 20 }}>
-          <Label bold size={13} color="#5C2E00">
+        <AlertIcon size={18} color={c.warn} />
+        <Label size={13} color={c.warnText} style={{ flex: 1, lineHeight: 20 }}>
+          <Label bold size={13} color={c.warnText}>
             {network.name}
           </Label>
           로 보내 달라고 하세요. 다른 네트워크로 보내면 이 앱에서 보이지 않고 되찾기 어렵습니다.
@@ -28,20 +40,14 @@ export default function Receive() {
       <Card style={styles.qrCard}>
         {/* 주소만 담는다(EIP-681 결제 URI는 나중에). MetaMask·거래소 앱이 그대로 읽는다 */}
         <View accessibilityLabel="내 지갑 주소 QR 코드" style={styles.qr}>
-          <QRCode
-            value={address}
-            size={220}
-            color={colors.text}
-            backgroundColor={colors.card}
-            ecl="M"
-          />
+          <QRCode value={address} size={220} color="#0F1115" backgroundColor="#FFFFFF" ecl="M" />
         </View>
         <View style={styles.addressRow}>
           <View style={{ flex: 1 }}>
             <Address value={address} />
           </View>
           <View style={{ gap: 4 }}>
-            <CopyButton value={address} filled color={colors.text} />
+            <CopyButton value={address} filled color={c.text} />
             <IconButton
               label="주소 공유"
               filled
@@ -76,17 +82,24 @@ export default function Receive() {
   );
 }
 
-const styles = StyleSheet.create({
-  warning: {
-    flexDirection: 'row',
-    gap: 10,
-    backgroundColor: '#FFF3E5',
-    borderRadius: 16,
-    padding: 14,
-  },
-  qrCard: { alignItems: 'center', paddingVertical: 24, gap: 18 },
-  qr: { padding: 12, borderRadius: 16, borderWidth: 1, borderColor: colors.border },
-  addressRow: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'stretch' },
-  assets: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
-  asset: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    warning: {
+      flexDirection: 'row',
+      gap: 10,
+      backgroundColor: c.warnSoft,
+      borderRadius: 16,
+      padding: 14,
+    },
+    qrCard: { alignItems: 'center', paddingVertical: 24, gap: 18 },
+    qr: {
+      padding: 12,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: '#FFFFFF',
+    },
+    addressRow: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'stretch' },
+    assets: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
+    asset: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  });

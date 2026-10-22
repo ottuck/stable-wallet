@@ -14,7 +14,17 @@ import { useBalances } from '@/features/home/use-balances';
 import { AlertIcon, CheckIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import { useSendFlow } from '@/features/send/store';
-import { Button, Card, colors, fonts, Label, Screen, TokenIcon } from '@/features/ui';
+import {
+  Button,
+  Card,
+  fonts,
+  Label,
+  type Palette,
+  Screen,
+  TokenIcon,
+  useColors,
+  useThemed,
+} from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
 function tryParse<T>(fn: () => T): T | null {
@@ -26,6 +36,8 @@ function tryParse<T>(fn: () => T): T | null {
 }
 
 export default function SendInput() {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const address = useWallet((s) => s.address)!;
   const network = useNetwork((s) => s.network);
   const tokens = tokensOn(network.id);
@@ -110,7 +122,7 @@ export default function SendInput() {
               style={[styles.segmentItem, i === tokenIndex && styles.segmentSelected]}
             >
               <TokenIcon symbol={t.symbol} size={20} />
-              <Label bold size={14} color={i === tokenIndex ? colors.text : colors.muted}>
+              <Label bold size={14} color={i === tokenIndex ? c.text : c.muted}>
                 {t.symbol}
               </Label>
             </Pressable>
@@ -126,7 +138,7 @@ export default function SendInput() {
             value={amountText}
             onChangeText={setAmountText}
             placeholder="0"
-            placeholderTextColor={colors.placeholder}
+            placeholderTextColor={c.placeholder}
             keyboardType="decimal-pad"
             autoFocus
             style={styles.amountInput}
@@ -148,18 +160,18 @@ export default function SendInput() {
             onPress={() => balance !== null && setAmountText(formatUnits(balance, token.decimals))}
             hitSlop={12}
           >
-            <Label bold size={13} color={colors.accent}>
+            <Label bold size={13} color={c.accent}>
               최대
             </Label>
           </Pressable>
         </View>
         {amountText !== '' && amount === null && (
-          <Label size={12} color={colors.danger}>
+          <Label size={12} color={c.danger}>
             {`금액을 확인해 주세요 (소수점 ${token.decimals}자리까지)`}
           </Label>
         )}
         {amount !== null && (
-          <Label mono muted size={11}>
+          <Label mono muted size={12}>
             {`raw ${amount.toString()} · decimals ${token.decimals}`}
           </Label>
         )}
@@ -180,7 +192,7 @@ export default function SendInput() {
           value={toText}
           onChangeText={setToText}
           placeholder="0x…"
-          placeholderTextColor={colors.placeholder}
+          placeholderTextColor={c.placeholder}
           autoCapitalize="none"
           autoCorrect={false}
           spellCheck={false}
@@ -190,20 +202,20 @@ export default function SendInput() {
         {toText !== '' && (
           <View style={styles.checks}>
             {to === null ? (
-              <Hint color={colors.danger} icon="alert">
+              <Hint color={c.danger} icon="alert">
                 주소 형식·체크섬이 맞지 않거나 토큰 컨트랙트 주소입니다
               </Hint>
             ) : toSelf ? (
-              <Hint color={colors.danger} icon="alert">
+              <Hint color={c.danger} icon="alert">
                 내 주소로는 보낼 수 없습니다
               </Hint>
             ) : (
               <>
-                <Hint color={colors.muted} icon="check">
+                <Hint color={c.muted} icon="check">
                   체크섬이 맞고, 토큰 컨트랙트 주소가 아닙니다
                 </Hint>
                 {firstTime && (
-                  <Hint color={colors.warn} icon="alert">
+                  <Hint color={c.warn} icon="alert">
                     처음 보내는 주소예요. 앞뒤 네 글자를 받는 쪽과 맞춰 보세요
                   </Hint>
                 )}
@@ -213,7 +225,7 @@ export default function SendInput() {
         )}
       </Card>
 
-      {error && <Label color={colors.danger}>{error}</Label>}
+      {error && <Label color={c.danger}>{error}</Label>}
     </Screen>
   );
 }
@@ -228,6 +240,7 @@ function TextButton({
   onPress: () => void;
   disabled?: boolean;
 }) {
+  const c = useColors();
   return (
     <Pressable
       accessibilityRole="button"
@@ -237,7 +250,7 @@ function TextButton({
       hitSlop={10}
       style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
     >
-      <Label bold size={13} color={disabled ? colors.placeholder : colors.accent}>
+      <Label bold size={13} color={disabled ? c.placeholder : c.accent}>
         {title}
       </Label>
     </Pressable>
@@ -253,10 +266,12 @@ function Hint({
   icon: 'check' | 'alert';
   children: React.ReactNode;
 }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   return (
     <View style={styles.hint}>
       {icon === 'check' ? (
-        <CheckIcon size={14} color={colors.accent} strokeWidth={3} />
+        <CheckIcon size={14} color={c.ok} strokeWidth={3} />
       ) : (
         <AlertIcon size={14} color={color} strokeWidth={2.4} />
       )}
@@ -267,44 +282,45 @@ function Hint({
   );
 }
 
-const styles = StyleSheet.create({
-  segment: { flexDirection: 'row', backgroundColor: '#E9EBEF', borderRadius: 12, padding: 4 },
-  segmentItem: {
-    flex: 1,
-    height: 44,
-    borderRadius: 9,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  segmentSelected: { backgroundColor: colors.card },
-  amountRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  amountInput: {
-    minWidth: 80,
-    maxWidth: 220,
-    fontFamily: fonts.monoBold,
-    fontSize: 40,
-    color: colors.text,
-    textAlign: 'center',
-    padding: 0,
-  },
-  balanceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  toHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  toActions: { flexDirection: 'row', gap: 18 },
-  toInput: {
-    minHeight: 44,
-    fontFamily: fonts.mono,
-    fontSize: 14,
-    color: colors.text,
-    padding: 0,
-    textAlignVertical: 'center',
-  },
-  checks: {
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-    paddingTop: 10,
-    gap: 6,
-  },
-  hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    segment: { flexDirection: 'row', backgroundColor: c.segment, borderRadius: 12, padding: 4 },
+    segmentItem: {
+      flex: 1,
+      height: 44,
+      borderRadius: 9,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+    },
+    segmentSelected: { backgroundColor: c.card },
+    amountRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    amountInput: {
+      minWidth: 80,
+      maxWidth: 220,
+      fontFamily: fonts.monoBold,
+      fontSize: 40,
+      color: c.text,
+      textAlign: 'center',
+      padding: 0,
+    },
+    balanceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    toHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    toActions: { flexDirection: 'row', gap: 18 },
+    toInput: {
+      minHeight: 44,
+      fontFamily: fonts.mono,
+      fontSize: 14,
+      color: c.text,
+      padding: 0,
+      textAlignVertical: 'center',
+    },
+    checks: {
+      borderTopWidth: 1,
+      borderTopColor: c.line,
+      paddingTop: 10,
+      gap: 6,
+    },
+    hint: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  });
