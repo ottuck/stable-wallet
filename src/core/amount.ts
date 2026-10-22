@@ -17,11 +17,13 @@ export function parseAmount(input: string, decimals: number): bigint {
 
 export type AmountKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '.' | 'back';
 
-/** 정수 부분은 이 자리수까지만 받는다(화면에 다 보이게) */
-const MAX_WHOLE_DIGITS = 12;
+/** 정수·소수 부분을 이 자리수까지만 받는다(화면에 다 보이게, 개인 지갑에 충분한 크기) */
+const MAX_WHOLE_DIGITS = 9;
+const MAX_FRACTION_DIGITS = 6;
 
 /**
- * 숫자 키패드 입력을 금액 문자열에 반영한다. 받을 수 없는 키(두 번째 소수점, decimals 초과 등)는 그대로 돌려준다.
+ * 숫자 키패드 입력을 금액 문자열에 반영한다. 받을 수 없는 키(두 번째 소수점, 자리수 초과 등)는 그대로 돌려준다.
+ * 소수는 토큰 decimals와 6자리 중 작은 쪽까지만 받는다(JPYC도 18자리를 다 입력하지 않는다).
  * 결과는 `0.` 처럼 입력 중인 모양일 수 있어, 값으로 쓰기 전에 parseAmount로 확인한다.
  */
 export function applyAmountKey(current: string, key: AmountKey, decimals: number): string {
@@ -31,7 +33,9 @@ export function applyAmountKey(current: string, key: AmountKey, decimals: number
     return current === '' ? '0.' : `${current}.`;
   }
   const [whole, fraction] = current.split('.');
-  if (fraction !== undefined) return fraction.length >= decimals ? current : current + key;
+  if (fraction !== undefined) {
+    return fraction.length >= Math.min(decimals, MAX_FRACTION_DIGITS) ? current : current + key;
+  }
   if (whole === '0') return key;
   return whole.length >= MAX_WHOLE_DIGITS ? current : current + key;
 }

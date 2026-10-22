@@ -29,8 +29,10 @@ describe('applyAmountKey', () => {
   it('받을 수 없는 키는 무시한다', () => {
     expect(type('1.2.3')).toBe('1.23');
     expect(type('0.1234567')).toBe('0.123456');
-    expect(type('1.1234567', 18)).toBe('1.1234567');
+    expect(type('1.1234567', 18)).toBe('1.123456');
+    expect(type('1.1234', 2)).toBe('1.12');
     expect(type('1.5', 0)).toBe('15');
+    expect(type('1234567890')).toBe('123456789');
   });
 
   it('지우면 마지막 글자만 없어진다', () => {

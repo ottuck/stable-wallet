@@ -38,7 +38,7 @@ function tryParse<T>(fn: () => T): T | null {
 
 /** 금액 글자는 길어지면 단계적으로 줄여 한 줄에 둔다 */
 function amountFontSize(length: number) {
-  return length > 14 ? 24 : length > 11 ? 30 : length > 8 ? 36 : 44;
+  return length > 13 ? 22 : length > 10 ? 28 : length > 8 ? 34 : 44;
 }
 
 export default function SendInput() {
@@ -96,7 +96,16 @@ export default function SendInput() {
   }
 
   async function paste() {
-    setToText((await Clipboard.getStringAsync()).trim());
+    // 웹에서 권한을 거부했거나 클립보드가 비어 있으면 직접 입력으로 넘겨 막히지 않게 한다
+    const text = await Clipboard.getStringAsync().then(
+      (value) => value.trim(),
+      () => '',
+    );
+    if (text === '') {
+      setTyping(true);
+      return;
+    }
+    setToText(text);
     setTyping(false);
   }
 
@@ -121,6 +130,7 @@ export default function SendInput() {
 
   return (
     <Screen
+      fill
       footer={
         <>
           <Button
@@ -167,7 +177,9 @@ export default function SendInput() {
         </View>
       )}
 
-      <Card style={{ alignItems: 'center', paddingVertical: 16 }}>
+      <Card
+        style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 16, flex: 1 }}
+      >
         <View style={styles.amountRow}>
           <TokenIcon symbol={token.symbol} size={28} />
           <Label
@@ -196,10 +208,7 @@ export default function SendInput() {
           <Pressable
             accessibilityRole="button"
             disabled={balance === null}
-            onPress={() =>
-              balance !== null &&
-              setAmountText(formatAmount(balance, token.decimals, token.decimals))
-            }
+            onPress={() => balance !== null && setAmountText(formatAmount(balance, token.decimals))}
             hitSlop={12}
           >
             <Label bold size={13} color={c.accent}>
