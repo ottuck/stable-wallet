@@ -22,6 +22,9 @@ import {
   useThemed,
 } from '@/features/ui';
 
+/** 대기 중인 거래를 다시 확인하기까지 */
+const RECHECK_MS = 10_000;
+
 /**
  * 보낸 거래 하나의 상세. 홈의 보낸 거래 줄에서 연다(?hash=).
  * 저장된 거래만 보여주고, 아직 대기 중이면 확정을 기다려 상태를 바꾼다. 블록 탐색기는 맨 아래 링크로만 연다.
@@ -33,17 +36,27 @@ export default function TxDetail() {
   const { hash } = useLocalSearchParams<{ hash?: string }>();
   const [tx, setTx] = useState(() => (hash ? getTx(hash) : null));
 
+  // 대기 중이면 확정을 기다린다. RPC 오류도 pending으로 돌아오므로 다시 볼 때는 간격을 둔다
+  const txHash = tx?.hash;
+  const networkId = tx?.networkId;
   const pending = tx?.status === 'pending';
   useEffect(() => {
-    if (!tx || !pending) return;
+    if (!txHash || !networkId || !pending) return;
     let active = true;
-    void waitForTransfer(NETWORKS[tx.networkId], tx.hash).then(() => {
-      if (active) setTx(getTx(tx.hash));
-    });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const check = () => {
+      void waitForTransfer(NETWORKS[networkId], txHash).then((r) => {
+        if (!active) return;
+        if (r.status === 'pending') timer = setTimeout(check, RECHECK_MS);
+        else setTx(getTx(txHash));
+      });
+    };
+    check();
     return () => {
       active = false;
+      clearTimeout(timer);
     };
-  }, [tx, pending]);
+  }, [txHash, networkId, pending]);
 
   if (!tx) {
     return (
