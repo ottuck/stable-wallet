@@ -74,6 +74,7 @@ export const ko = {
     receive: '받기',
     scan: '스캔',
     sentTxs: '보낸 거래',
+    noTxsTitle: '아직 보낸 거래가 없습니다',
     noTxs: '이 앱에서 보낸 거래가 여기에 쌓입니다. 받은 입금은 위 잔액에 바로 반영됩니다.',
     gasNote: '수수료(가스)로 쓰입니다',
     sendsLeft: (n: string) => `전송 약 ${n}회`,
@@ -266,6 +267,7 @@ export const en: Messages = {
     receive: 'Receive',
     scan: 'Scan',
     sentTxs: 'Sent',
+    noTxsTitle: 'No transfers yet',
     noTxs:
       'Transfers you send from this app will show up here. Incoming deposits appear in your balance.',
     gasNote: 'Used to pay network fees (gas)',

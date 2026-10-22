@@ -8,6 +8,7 @@ import { tokensOn } from '@/core/config/tokens';
 import type { AssetBalance } from '@/core/evm/balances';
 import type { WalletTx } from '@/core/history';
 import { withSigner } from '@/core/keys/vault';
+import { HenryCoin } from '@/features/brand';
 import { CopyButton } from '@/features/copy-button';
 import { errorMessage } from '@/features/error-message';
 import { openExplorer, shortAddress, shortHash } from '@/features/format';
@@ -145,9 +146,17 @@ export default function Home() {
       </Label>
       <Card style={{ paddingVertical: 4, gap: 0 }}>
         {txs.length === 0 ? (
-          <Label muted size={13} style={{ paddingVertical: 14, lineHeight: 20 }}>
-            {t.home.noTxs}
-          </Label>
+          <View style={styles.empty}>
+            <View style={{ transform: [{ rotate: '-10deg' }] }}>
+              <HenryCoin size={52} shadow />
+            </View>
+            <Label bold size={15}>
+              {t.home.noTxsTitle}
+            </Label>
+            <Label muted size={13} style={{ lineHeight: 20, textAlign: 'center' }}>
+              {t.home.noTxs}
+            </Label>
+          </View>
         ) : (
           txs.map((tx, i) => (
             <TxRow
@@ -379,6 +388,7 @@ const makeStyles = (c: Palette) =>
     },
     stables: { gap: 2 },
     actions: { flexDirection: 'row', gap: 8 },
+    empty: { alignItems: 'center', gap: 6, paddingVertical: 20, paddingHorizontal: 8 },
     action: {
       flex: 1,
       minHeight: 72,
