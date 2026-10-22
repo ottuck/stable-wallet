@@ -23,8 +23,12 @@ export default function Scan() {
   const handled = useRef(false);
 
   // 처음 열면 바로 권한을 묻는다(거절한 적이 있으면 설정 안내 버튼만 보인다)
+  // 한 번만 묻는다(Android는 거절 뒤에도 canAskAgain이 true라 매번 다시 물을 수 있다)
+  const asked = useRef(false);
   useEffect(() => {
-    if (permission && !permission.granted && permission.canAskAgain) void requestPermission();
+    if (asked.current || !permission || permission.granted || !permission.canAskAgain) return;
+    asked.current = true;
+    void requestPermission();
   }, [permission, requestPermission]);
 
   function onScanned({ data }: BarcodeScanningResult) {
