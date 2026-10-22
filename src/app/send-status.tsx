@@ -1,10 +1,19 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { formatAmount } from '@/core/amount';
 import type { ReceiptResult } from '@/core/evm/send';
 import { waitForTransfer } from '@/core/transfer';
+import { HenryCoin } from '@/features/brand';
 import { formatTime, openExplorer, shortAddress, shortHash } from '@/features/format';
 import { useT } from '@/features/i18n';
 import { AlertIcon, CheckIcon, ClockIcon } from '@/features/icons';
@@ -67,13 +76,17 @@ export default function SendStatus() {
       <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
 
       <View style={styles.hero}>
-        <View style={[styles.badge, { backgroundColor: `${tone}1A` }]}>
+        <View style={styles.heroIcon}>
           {status === 'confirmed' ? (
-            <CheckIcon size={34} color={tone} strokeWidth={2.6} />
-          ) : status === 'pending' ? (
-            <ClockIcon size={34} color={tone} />
+            <CoinReveal />
           ) : (
-            <AlertIcon size={34} color={tone} />
+            <View style={[styles.badge, { backgroundColor: `${tone}1A` }]}>
+              {status === 'pending' ? (
+                <ClockIcon size={34} color={tone} />
+              ) : (
+                <AlertIcon size={34} color={tone} />
+              )}
+            </View>
           )}
         </View>
         <Label bold size={22}>
@@ -142,6 +155,61 @@ export default function SendStatus() {
         />
       </Card>
     </Screen>
+  );
+}
+
+/** 보냈을 때만 나오는 헨리 코인. 뒤집히며 나타나고 고리가 퍼진다(동작 줄이기를 켜 두면 바로 보인다). */
+function CoinReveal() {
+  const styles = useThemed(makeStyles);
+  const [progress] = useState(() => new Animated.Value(0));
+
+  useEffect(() => {
+    let active = true;
+    void AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
+      if (!active) return;
+      if (reduce) {
+        progress.setValue(1);
+        return;
+      }
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: 1100,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: Platform.OS !== 'web',
+      }).start();
+    });
+    return () => {
+      active = false;
+      progress.stopAnimation();
+    };
+  }, [progress]);
+
+  const coin = {
+    opacity: progress.interpolate({
+      inputRange: [0, 0.25],
+      outputRange: [0, 1],
+      extrapolate: 'clamp',
+    }),
+    transform: [
+      { perspective: 600 },
+      { rotateY: progress.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '720deg'] }) },
+      { scale: progress.interpolate({ inputRange: [0, 0.7, 1], outputRange: [0.5, 1.1, 1] }) },
+    ],
+  };
+  const ring = {
+    opacity: progress.interpolate({ inputRange: [0, 0.65, 1], outputRange: [0, 0.9, 0] }),
+    transform: [
+      { scale: progress.interpolate({ inputRange: [0, 0.65, 1], outputRange: [0.6, 0.6, 1.5] }) },
+    ],
+  };
+  return (
+    <View style={styles.coinStage}>
+      <View style={styles.glow} />
+      <Animated.View style={[styles.ring, ring]} />
+      <Animated.View style={coin}>
+        <HenryCoin size={84} check />
+      </Animated.View>
+    </View>
   );
 }
 
@@ -217,7 +285,24 @@ function Step({
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    hero: { alignItems: 'center', gap: 10, paddingTop: 40, paddingBottom: 8 },
+    hero: { alignItems: 'center', gap: 10, paddingTop: 24, paddingBottom: 8 },
+    heroIcon: { width: 120, height: 120, alignItems: 'center', justifyContent: 'center' },
+    coinStage: { width: 120, height: 120, alignItems: 'center', justifyContent: 'center' },
+    glow: {
+      position: 'absolute',
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor: 'rgba(242,165,22,0.14)',
+    },
+    ring: {
+      position: 'absolute',
+      width: 84,
+      height: 84,
+      borderRadius: 42,
+      borderWidth: 2,
+      borderColor: '#F2A516',
+    },
     badge: {
       width: 72,
       height: 72,
