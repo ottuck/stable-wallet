@@ -12,7 +12,8 @@ import type { NetworkConfig } from '../config/networks';
 import type { TokenConfig } from '../config/tokens';
 import { WalletError } from '../errors';
 import type { TxStatus } from '../history';
-import { ERC20_ABI, getProvider } from './balances';
+import { ERC20_ABI } from './balances';
+import { getProvider } from './provider';
 
 const ERC20 = new Interface(ERC20_ABI);
 const MIN_MAX_FEE_PER_GAS = 1_000_000_000n; // 1 gwei

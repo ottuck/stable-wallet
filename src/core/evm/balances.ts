@@ -1,8 +1,9 @@
-import { Contract, JsonRpcProvider, Network } from 'ethers';
+import { Contract } from 'ethers';
 
-import type { NetworkConfig, NetworkId } from '../config/networks';
+import type { NetworkConfig } from '../config/networks';
 import { tokensOn } from '../config/tokens';
 import { WalletError } from '../errors';
+import { getProvider } from './provider';
 
 export const ERC20_ABI = [
   'function balanceOf(address owner) view returns (uint256)',
@@ -16,20 +17,6 @@ export type AssetBalance = {
   /** native면 없다 */
   tokenAddress?: string;
 };
-
-const providers = new Map<NetworkId, JsonRpcProvider>();
-
-export function getProvider(network: NetworkConfig): JsonRpcProvider {
-  let provider = providers.get(network.id);
-  if (!provider) {
-    // chainId를 고정해 매 요청마다 eth_chainId를 부르지 않는다. 서명 전에는 따로 확인한다.
-    provider = new JsonRpcProvider(network.rpcUrl, network.chainId, {
-      staticNetwork: Network.from(network.chainId),
-    });
-    providers.set(network.id, provider);
-  }
-  return provider;
-}
 
 // ERC-20 transfer 한 번의 대략적인 가스 사용량(홈의 "전송 약 N회" 표시용)
 const TYPICAL_TRANSFER_GAS = 65_000n;
