@@ -1,4 +1,4 @@
-# Stable Wallet — 에이전트 작업 규칙
+# Henry Wallet — 에이전트 작업 규칙
 
 개인용 self-custody EVM stablecoin 지갑(Expo SDK 58, React Native, TypeScript). iPhone 개발용 빌드가 기준.
 
@@ -40,6 +40,8 @@ pnpm dlx expo-doctor       # 의존성·설정 진단
 ## Git
 
 - `main`에 직접 push하지 않는다. 브랜치(`feat/…`, `fix/…`, `docs/…`, `chore/…`) → PR → CI 통과 → squash merge.
+- 작업을 끝내면 에이전트가 push → PR 생성 → CI 확인 → squash merge까지 사용자에게 다시 묻지 않고 진행한다(사용자가 위임함).
+  CI가 실패하면 병합하지 않고 원인을 고친다. 병합 뒤에는 `main`을 받아 작업 브랜치를 정리한다.
 - 커밋 메시지는 한국어 conventional commit(`feat: 지갑 생성 화면을 더한다`). 커밋은 리뷰 가능한 단위로 나눈다.
 - PR 라벨: 종류(`feat`/`fix`/`docs`/`chore`) + 단계(`phase-1`/`phase-2`), 키·서명·저장을 건드리면 `security`.
 - PR을 올리면 Codex(`chatgpt-codex-connector[bot]`)가 리뷰한다. **리뷰는 선택이다**: CI가 통과하면 병합하고, Codex 리뷰를

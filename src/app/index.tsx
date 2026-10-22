@@ -4,6 +4,7 @@ import { ActionSheetIOS, Alert, Platform, Pressable, StyleSheet, View } from 're
 
 import { formatAmount } from '@/core/amount';
 import { activeNetworks } from '@/core/config/networks';
+import { tokensOn } from '@/core/config/tokens';
 import type { AssetBalance } from '@/core/evm/balances';
 import type { WalletTx } from '@/core/history';
 import { withSigner } from '@/core/keys/vault';
@@ -18,15 +19,19 @@ import {
   Address,
   Button,
   Card,
-  colors,
   Label,
   networkColor,
   Screen,
   TokenIcon,
+  useColors,
+  useThemed,
+  type Palette,
 } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
 export default function Home() {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const address = useWallet((s) => s.address)!;
   const { network, setNetwork } = useNetwork();
   const { balances, transferFee, error, loading, refresh } = useBalances(network, address);
@@ -64,9 +69,12 @@ export default function Home() {
     );
   }
 
-  // 스테이블코인 먼저, 가스용 native는 마지막
-  const tokens = balances?.filter((b) => b.tokenAddress) ?? [];
+  // 스테이블코인은 큰 잔액으로, 가스용 native는 따로
   const native = balances?.find((b) => !b.tokenAddress);
+  const stables = tokensOn(network.id).map((token) => ({
+    token,
+    balance: balances?.find((b) => b.tokenAddress === token.address),
+  }));
 
   return (
     <Screen onRefresh={reload}>
@@ -79,55 +87,63 @@ export default function Home() {
         >
           <View style={[styles.dot, { backgroundColor: networkColor(network.native.symbol) }]} />
           <Label bold>{network.name}</Label>
-          <Label mono muted size={11}>
-            {String(network.chainId)}
-          </Label>
-          <ChevronDownIcon size={14} />
+          <ChevronDownIcon size={14} color={c.muted} />
         </Pressable>
         <RpcStatus loading={loading} failed={error != null} />
       </View>
 
-      <Card style={{ gap: 14 }}>
+      <Card style={{ gap: 16 }}>
         <View style={styles.addressRow}>
-          <Address value={address} short />
+          <View style={{ gap: 2 }}>
+            <Label muted size={12}>
+              내 주소
+            </Label>
+            <Address value={address} short />
+          </View>
           <CopyButton value={address} />
         </View>
+
+        <View style={styles.stables}>
+          {stables.map(({ token, balance }) => (
+            <TokenRow
+              key={token.symbol}
+              symbol={token.symbol}
+              address={token.address}
+              amount={
+                balance ? formatAmount(balance.raw, balance.decimals, 2) : error != null ? '—' : '…'
+              }
+              onContract={() => openExplorer(network, `token/${token.address}`)}
+            />
+          ))}
+          {error != null && (
+            <Label muted size={13}>
+              {errorMessage(error)}
+            </Label>
+          )}
+        </View>
+
         <View style={styles.actions}>
           <Action label="보내기" primary onPress={() => router.push('/send')}>
-            <SendIcon size={22} color="#FFFFFF" strokeWidth={2.2} />
+            <SendIcon size={22} color={c.onPrimary} strokeWidth={2.2} />
           </Action>
           <Action label="받기" onPress={() => router.push('/receive')}>
-            <ReceiveIcon size={22} color={colors.accentText} strokeWidth={2.2} />
+            <ReceiveIcon size={22} color={c.accentText} strokeWidth={2.2} />
           </Action>
           <Action label="스캔" onPress={() => router.push('/scan?from=home')}>
-            <ScanIcon size={22} color={colors.accentText} strokeWidth={2.2} />
+            <ScanIcon size={22} color={c.accentText} strokeWidth={2.2} />
           </Action>
         </View>
       </Card>
 
-      <Card style={{ paddingVertical: 6, gap: 0 }}>
-        {tokens.map((b) => (
-          <TokenRow
-            key={b.symbol}
-            balance={b}
-            onContract={() => openExplorer(network, `token/${b.tokenAddress}`)}
-          />
-        ))}
-        {native && <NativeRow balance={native} transferFee={transferFee} />}
-        {error != null && (
-          <Label muted size={13} style={{ paddingVertical: 12 }}>
-            {errorMessage(error)}
-          </Label>
-        )}
-      </Card>
+      {native && <GasCard balance={native} transferFee={transferFee} />}
 
       <Label bold size={14} style={{ paddingHorizontal: 4 }}>
-        거래
+        보낸 거래
       </Label>
       <Card style={{ paddingVertical: 4, gap: 0 }}>
         {txs.length === 0 ? (
-          <Label muted size={13} style={{ paddingVertical: 14 }}>
-            이 앱에서 보낸 거래가 여기에 쌓입니다.
+          <Label muted size={13} style={{ paddingVertical: 14, lineHeight: 20 }}>
+            이 앱에서 보낸 거래가 여기에 쌓입니다. 받은 입금은 위 잔액에 바로 반영됩니다.
           </Label>
         ) : (
           txs.map((tx, i) => (
@@ -147,13 +163,15 @@ export default function Home() {
 }
 
 function RpcStatus({ loading, failed }: { loading: boolean; failed: boolean }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const [color, text] = loading
-    ? [colors.placeholder, '확인 중']
+    ? [c.placeholder, '확인 중']
     : failed
-      ? [colors.danger, 'RPC 연결 안 됨']
-      : [colors.ok, 'RPC 연결됨'];
+      ? [c.danger, '연결 안 됨']
+      : [c.ok, '연결됨'];
   return (
-    <View style={styles.status}>
+    <View style={styles.status} accessibilityLabel={`네트워크 ${text}`}>
       <View style={[styles.dot, { width: 8, height: 8, backgroundColor: color }]} />
       <Label muted size={12}>
         {text}
@@ -175,6 +193,8 @@ function Action({
   onPress?: () => void;
   children: React.ReactNode;
 }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   return (
     <Pressable
       accessibilityRole="button"
@@ -184,62 +204,70 @@ function Action({
       style={({ pressed }) => [
         styles.action,
         {
-          backgroundColor: primary ? colors.accent : colors.accentSoft,
+          backgroundColor: primary ? c.primary : c.accentSoft,
           opacity: disabled ? 0.4 : pressed ? 0.7 : 1,
         },
       ]}
     >
       {children}
-      <Label bold size={13} color={primary ? '#FFFFFF' : colors.accentText}>
+      <Label bold size={13} color={primary ? c.onPrimary : c.accentText}>
         {label}
       </Label>
     </Pressable>
   );
 }
 
-function TokenRow({ balance, onContract }: { balance: AssetBalance; onContract: () => void }) {
+function TokenRow({
+  symbol,
+  address,
+  amount,
+  onContract,
+}: {
+  symbol: string;
+  address: string;
+  amount: string;
+  onContract: () => void;
+}) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   return (
-    <View style={[styles.assetRow, styles.rowLine]}>
+    <View style={styles.assetRow}>
       <View style={styles.assetName}>
-        <TokenIcon symbol={balance.symbol} />
+        <TokenIcon symbol={symbol} size={40} />
         <View style={{ gap: 2 }}>
-          <Label bold>{balance.symbol}</Label>
+          <Label bold>{symbol}</Label>
           <Pressable accessibilityRole="link" onPress={onContract} hitSlop={8}>
-            <Label mono size={11} color={colors.accent}>
-              {`${shortAddress(balance.tokenAddress!)} ↗`}
+            <Label mono size={12} color={c.accent}>
+              {`${shortAddress(address)} ↗`}
             </Label>
           </Pressable>
         </View>
       </View>
-      <Label mono bold size={18}>
-        {formatAmount(balance.raw, balance.decimals, 2)}
+      <Label mono bold size={24} accessibilityLabel={`${symbol} ${amount}`}>
+        {amount}
       </Label>
     </View>
   );
 }
 
-function NativeRow({
-  balance,
-  transferFee,
-}: {
-  balance: AssetBalance;
-  transferFee: bigint | null;
-}) {
+function GasCard({ balance, transferFee }: { balance: AssetBalance; transferFee: bigint | null }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   // 지금 수수료로 ERC-20 전송을 몇 번 할 수 있는지(50번을 가득으로 본다)
   const sends = transferFee ? Number(balance.raw / transferFee) : null;
   return (
-    <View style={{ paddingVertical: 12, gap: 8 }}>
+    <Card style={{ gap: 12 }}>
       <View style={styles.assetRow}>
         <View style={styles.assetName}>
-          <TokenIcon symbol={balance.symbol} />
+          <TokenIcon symbol={balance.symbol} size={32} />
           <View style={{ gap: 2 }}>
             <Label bold>{balance.symbol}</Label>
-            <Label muted size={11}>
-              가스(수수료)용
+            <Label muted size={12}>
+              수수료(가스)로 쓰입니다
             </Label>
           </View>
         </View>
-        <Label mono bold size={18}>
+        <Label mono bold size={16}>
           {formatAmount(balance.raw, balance.decimals, 4)}
         </Label>
       </View>
@@ -251,21 +279,23 @@ function NativeRow({
                 styles.meterFill,
                 {
                   width: `${Math.min(sends / 50, 1) * 100}%`,
-                  backgroundColor: sends === 0 ? colors.danger : networkColor(balance.symbol),
+                  backgroundColor: sends === 0 ? c.danger : networkColor(balance.symbol),
                 },
               ]}
             />
           </View>
-          <Label muted size={11}>
+          <Label muted size={12} color={sends === 0 ? c.danger : undefined}>
             {sends === 0 ? '전송 불가 · 가스 부족' : `전송 약 ${sends > 999 ? '999+' : sends}회`}
           </Label>
         </View>
       )}
-    </View>
+    </Card>
   );
 }
 
 function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: () => void }) {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   return (
     <Pressable
       accessibilityRole="link"
@@ -274,14 +304,14 @@ function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: ()
     >
       <View style={{ gap: 4, flexShrink: 1 }}>
         <Label bold>{`−${formatAmount(BigInt(tx.amount), tx.decimals, 2)} ${tx.symbol}`}</Label>
-        <Label mono muted size={11}>
+        <Label mono muted size={12}>
           {`→ ${shortAddress(tx.toAddress)} · ${shortHash(tx.hash)}`}
         </Label>
       </View>
       {tx.status === 'pending' ? (
         <View style={styles.status}>
-          <ClockIcon size={14} color={colors.warn} strokeWidth={2.4} />
-          <Label bold size={13} color={colors.warn}>
+          <ClockIcon size={14} color={c.warn} strokeWidth={2.4} />
+          <Label bold size={13} color={c.warn}>
             확정 대기
           </Label>
         </View>
@@ -290,7 +320,7 @@ function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: ()
           {formatDate(tx.createdAt)}
         </Label>
       ) : (
-        <Label bold size={13} color={colors.danger}>
+        <Label bold size={13} color={c.danger}>
           {tx.status === 'failed' ? '실패' : '전송 안 됨'}
         </Label>
       )}
@@ -332,42 +362,43 @@ function DevTools({ address }: { address: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  networkButton: {
-    height: 44,
-    paddingLeft: 12,
-    paddingRight: 14,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  status: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: -8,
-    marginRight: -10,
-  },
-  actions: { flexDirection: 'row', gap: 8 },
-  action: {
-    flex: 1,
-    height: 72,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  assetRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  rowLine: { borderBottomWidth: 1, borderBottomColor: colors.line },
-  assetName: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
-  meterRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 48 },
-  meter: { flex: 1, height: 6, borderRadius: 3, backgroundColor: colors.line },
-  meterFill: { height: 6, borderRadius: 3 },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    networkButton: {
+      minHeight: 44,
+      paddingLeft: 12,
+      paddingRight: 14,
+      borderRadius: 22,
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: c.card,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    dot: { width: 10, height: 10, borderRadius: 5 },
+    status: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    addressRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginRight: -10,
+    },
+    stables: { gap: 2 },
+    actions: { flexDirection: 'row', gap: 8 },
+    action: {
+      flex: 1,
+      minHeight: 72,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+    },
+    assetRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    rowLine: { borderBottomWidth: 1, borderBottomColor: c.line },
+    assetName: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
+    meterRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 44 },
+    meter: { flex: 1, height: 6, borderRadius: 3, backgroundColor: c.line },
+    meterFill: { height: 6, borderRadius: 3 },
+  });

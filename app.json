@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Stable Wallet",
+    "name": "Henry Wallet",
     "slug": "stable-wallet",
     "version": "0.1.0",
     "orientation": "portrait",
@@ -8,7 +8,11 @@
     "scheme": "stablewallet",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": {
+        "light": "./assets/images/icon.png",
+        "dark": "./assets/images/icon-dark.png",
+        "tinted": "./assets/images/icon-tinted.png"
+      },
       "bundleIdentifier": "com.ottuck.stablewallet",
       "supportsTablet": false,
       "infoPlist": {
@@ -17,9 +21,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#2A52D6",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
@@ -36,21 +39,21 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#2A52D6",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 160
         }
       ],
       [
         "expo-secure-store",
         {
-          "faceIDPermission": "Stable Wallet uses Face ID to unlock your recovery phrase before signing."
+          "faceIDPermission": "Henry Wallet uses Face ID to unlock your recovery phrase before signing."
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Stable Wallet uses the camera only to scan wallet address QR codes.",
+          "cameraPermission": "Henry Wallet uses the camera only to scan wallet address QR codes.",
           "microphonePermission": false,
           "recordAudioAndroid": false
         }

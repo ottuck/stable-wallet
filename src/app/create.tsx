@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { deriveAddress, generateMnemonic } from '@/core/keys/mnemonic';
 import { errorMessage } from '@/features/error-message';
-import { Button, Card, colors, Label, Screen } from '@/features/ui';
+import { Button, Card, Label, type Palette, Screen, useColors, useThemed } from '@/features/ui';
 import { useSecretScreen } from '@/features/use-secret-screen';
 import { useWallet } from '@/features/wallet/store';
 
@@ -38,6 +38,8 @@ function makeQuiz(phrase: string) {
 }
 
 export default function Create() {
+  const c = useColors();
+  const styles = useThemed(makeStyles);
   const [draft, setDraft] = useState(createDraft);
   // 저장 중에 찍힌 스크린샷도 알 수 있게 지금 보이는 문구를 ref로 따라간다
   const currentDraft = useRef(draft);
@@ -114,7 +116,7 @@ export default function Create() {
           모두 사기입니다.
         </Label>
         {__DEV__ && <Label muted size={12}>{`생성·파생 ${draft.elapsedMs}ms`}</Label>}
-        {error && <Label color={colors.danger}>{error}</Label>}
+        {error && <Label color={c.danger}>{error}</Label>}
       </Screen>
     );
   }
@@ -124,12 +126,12 @@ export default function Create() {
       footer={
         <>
           {answered && !correct && (
-            <Label size={13} color={colors.danger}>
+            <Label size={13} color={c.danger}>
               맞지 않는 단어가 있습니다. 적어 둔 문구를 다시 확인해 주세요.
             </Label>
           )}
           {error && (
-            <Label size={13} color={colors.danger}>
+            <Label size={13} color={c.danger}>
               {error}
             </Label>
           )}
@@ -139,7 +141,7 @@ export default function Create() {
             onPress={() => setStep('write')}
             style={styles.back}
           >
-            <Label bold size={14} color={colors.accent}>
+            <Label bold size={14} color={c.accent}>
               문구 다시 보기
             </Label>
           </Pressable>
@@ -161,7 +163,7 @@ export default function Create() {
                   onPress={() => setPicked((p) => ({ ...p, [q.position]: option }))}
                   style={[styles.option, selected && styles.optionSelected]}
                 >
-                  <Label mono size={15} color={selected ? '#FFFFFF' : colors.text}>
+                  <Label mono size={15} color={selected ? c.onPrimary : c.text}>
                     {option}
                   </Label>
                 </Pressable>
@@ -174,19 +176,20 @@ export default function Create() {
   );
 }
 
-const styles = StyleSheet.create({
-  words: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 10 },
-  word: { width: '50%', flexDirection: 'row', alignItems: 'baseline' },
-  options: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  option: {
-    width: '48%',
-    flexGrow: 1,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: colors.soft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionSelected: { backgroundColor: colors.accent },
-  back: { height: 44, alignItems: 'center', justifyContent: 'center' },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    words: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 10 },
+    word: { width: '50%', flexDirection: 'row', alignItems: 'baseline' },
+    options: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    option: {
+      width: '48%',
+      flexGrow: 1,
+      height: 48,
+      borderRadius: 12,
+      backgroundColor: c.soft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    optionSelected: { backgroundColor: c.primary },
+    back: { height: 44, alignItems: 'center', justifyContent: 'center' },
+  });

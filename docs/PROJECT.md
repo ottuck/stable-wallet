@@ -1,4 +1,4 @@
-# Stable Wallet — 프로젝트 명세
+# Henry Wallet — 프로젝트 명세
 
 개인용 self-custody EVM stablecoin 지갑. 서버가 자산·키를 갖지 않고, mnemonic은 기기 안에만 있고, 서명은 기기에서 한다.
 이 문서가 기준(source of truth)이다. 결정이 바뀌면 코드와 같은 커밋에서 고친다. 지금 상태만 적는다.
@@ -138,7 +138,7 @@ History 행: `hash, networkId, asset, from, to, amount(raw 문자열), status, c
 
 ## UI
 
-D안 "투명한 거래"(디자인 캔버스: claude.ai/artifact/N8kxDH1edd99Y2QP3v2TwN). 밝은 테마 하나, 흰 카드 + 회색 바탕, 강조색 `#2F5BEA`, 숫자·주소·tx 값은 IBM Plex Mono. 칩(배지) 대신 아이콘+글자. 뜻이 분명한 보조 동작(복사·공유)은 아이콘 버튼, 헷갈릴 수 있는 것(붙여넣기·QR 스캔)은 글자 버튼. 토큰 로고는 `assets/tokens/`: USDC·POL·ETH는 Trust Wallet assets(MIT), JPYC는 JPYC 공식 GitHub 조직 프로필 이미지. 토큰은 `src/features/ui.tsx`.
+D안 "투명한 거래"(디자인 캔버스: claude.ai/artifact/N8kxDH1edd99Y2QP3v2TwN). 이름은 Henry Wallet, 마크는 파란 바탕의 흰 H + 금색 코인(`assets/images/icon*.png`, 앱 안은 `features/brand.tsx`). 시스템 설정을 따라 밝은/어두운 테마(토큰은 `features/ui.tsx`의 `useColors`, 화면에서 색을 직접 쓰지 않는다), 흰 카드 + 회색 바탕, 채움색 `primary` `#2F5BEA`, 성공은 `ok`(초록), 숫자·주소·tx 값은 IBM Plex Mono. 글자는 12pt 이상, 큰 글씨 설정은 1.3배까지. 서명 전 확인 화면은 금액·받는 주소·검증·수수료를 먼저 보이고 raw 트랜잭션 필드는 접어 둔다. 칩(배지) 대신 아이콘+글자. 뜻이 분명한 보조 동작(복사·공유)은 아이콘 버튼, 헷갈릴 수 있는 것(붙여넣기·QR 스캔)은 글자 버튼. 토큰 로고는 `assets/tokens/`: USDC·POL·ETH는 Trust Wallet assets(MIT), JPYC는 JPYC 공식 GitHub 조직 프로필 이미지. 토큰은 `src/features/ui.tsx`.
 
 ## 테스트
 

@@ -30,6 +30,7 @@ Phase 2까지가 1차 완성이다. Phase 3·4는 선택.
 - [ ] Receive(주소, 복사, QR, 네트워크 경고)
 - [ ] QR 스캔 → 수신자 입력
 - [ ] History(pending → confirmed/failed/dropped, 재시작 후 이어서 확인)
+- [ ] 개발용 빌드를 다시 만든 뒤 앱 이름·아이콘·스플래시, 다크 모드 화면 확인
 
 ### Phase 1 완료 확인
 

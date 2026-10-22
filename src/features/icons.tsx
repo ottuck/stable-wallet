@@ -1,18 +1,19 @@
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
-import { colors } from './ui';
+import { useColors } from './ui';
 
 type IconProps = { size?: number; color?: string; strokeWidth?: number };
 
 function icon(render: () => React.ReactNode) {
-  return function Icon({ size = 20, color = colors.text, strokeWidth = 2 }: IconProps) {
+  return function Icon({ size = 20, color, strokeWidth = 2 }: IconProps) {
+    const c = useColors();
     return (
       <Svg
         width={size}
         height={size}
         viewBox="0 0 24 24"
         fill="none"
-        stroke={color}
+        stroke={color ?? c.text}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -59,5 +60,23 @@ export const FaceIdIcon = icon(() => (
   <>
     <Path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
     <Path d="M9 10v1M15 10v1M12 10v3h-1M9.5 15.5a3.5 3.5 0 0 0 5 0" />
+  </>
+));
+export const ShieldIcon = icon(() => (
+  <>
+    <Path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+    <Path d="M9 12l2.2 2.2L15.5 10" />
+  </>
+));
+export const EyeIcon = icon(() => (
+  <>
+    <Path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+    <Circle cx={12} cy={12} r={3} />
+  </>
+));
+export const KeyIcon = icon(() => (
+  <>
+    <Circle cx={8} cy={15} r={4} />
+    <Path d="M11 12l9-9M16 7l3 3M14 9l2 2" />
   </>
 ));

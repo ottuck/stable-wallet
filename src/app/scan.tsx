@@ -7,13 +7,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { parseAddressQr } from '@/core/address';
 import { CrossIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
-import { Button, Label } from '@/features/ui';
+import { Button, Label, type Palette, useThemed } from '@/features/ui';
 
 /**
  * 주소 QR을 읽어 보내기 화면의 받는 주소로 넘긴다.
  * from=home이면 보내기 화면을 새로 열고, 아니면 열려 있던 보내기 화면으로 돌아간다.
  */
 export default function Scan() {
+  const styles = useThemed(makeStyles);
   const { from } = useLocalSearchParams<{ from?: string }>();
   const network = useNetwork((s) => s.network);
   const insets = useSafeAreaInsets();
@@ -104,32 +105,33 @@ export default function Scan() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#000000' },
-  center: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  frame: {
-    width: 240,
-    height: 240,
-    borderRadius: 24,
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-  },
-  top: { position: 'absolute', left: 16, right: 16, top: 0 },
-  close: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bottom: { position: 'absolute', left: 24, right: 24, bottom: 0, gap: 6 },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    root: { flex: 1, backgroundColor: '#000000' },
+    center: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    frame: {
+      width: 240,
+      height: 240,
+      borderRadius: 24,
+      borderWidth: 3,
+      borderColor: '#FFFFFF',
+    },
+    top: { position: 'absolute', left: 16, right: 16, top: 0 },
+    close: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    bottom: { position: 'absolute', left: 24, right: 24, bottom: 0, gap: 6 },
+  });

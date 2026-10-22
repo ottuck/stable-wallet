@@ -1,4 +1,4 @@
-# Stable Wallet
+# Henry Wallet
 
 A lightweight self-custody EVM stablecoin wallet built with React Native (Expo).
 
