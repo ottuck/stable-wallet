@@ -6,6 +6,8 @@
 
 <p align="center">A self-custody wallet for stablecoins.<br />Your keys stay on your phone. No account, no server, no middleman.</p>
 
+<p align="center"><a href="https://wallet.portfolio-hub.dev"><b>Try the live demo →</b></a><br />Runs in your browser with sample data. No real money moves.</p>
+
 ## What is Henry Wallet?
 
 Henry Wallet is a small, personal wallet for holding and sending stablecoins such as **USDC** and **JPYC**. Everything happens on your own phone: the app creates your wallet, keeps its secret safe, and signs each payment only after you approve it with Face ID.
