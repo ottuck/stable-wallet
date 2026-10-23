@@ -404,7 +404,7 @@ const makeStyles = (c: Palette) =>
       justifyContent: 'center',
       gap: 8,
     },
-    segmentSelected: { backgroundColor: c.card },
+    segmentSelected: { backgroundColor: c.segmentOn },
     amountRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     balanceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     toHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
