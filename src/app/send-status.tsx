@@ -60,18 +60,8 @@ export default function SendStatus() {
 
   return (
     <Screen
-      footer={
-        <>
-          <Pressable
-            accessibilityRole="link"
-            onPress={() => openExplorer(p.network, `tx/${sent.hash}`)}
-            style={styles.explorer}
-          >
-            <Label bold>{t.status.viewOn(p.network.explorerUrl.replace('https://', ''))}</Label>
-          </Pressable>
-          <Button title={t.status.home} onPress={home} />
-        </>
-      }
+      // 블록 탐색기는 '네트워크에 전송' 줄의 hash 링크로 연다(거래 상세에도 있다)
+      footer={<Button title={t.status.home} onPress={home} />}
     >
       <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
 
@@ -321,11 +311,4 @@ const makeStyles = (c: Palette) =>
       justifyContent: 'center',
     },
     line: { flex: 1, width: 2, minHeight: 20 },
-    explorer: {
-      height: 52,
-      borderRadius: 16,
-      backgroundColor: c.card,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
   });
