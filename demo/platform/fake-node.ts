@@ -1,6 +1,5 @@
 import type { NetworkConfig } from '@/core/config/networks';
 import { tokensOn } from '@/core/config/tokens';
-import type * as Real from '@/core/evm/provider';
 import {
   Interface,
   Transaction,
@@ -21,7 +20,7 @@ const ERC20 = new Interface([
 type Sent = { confirmAt: number; gasUsed: bigint; gasPrice: bigint };
 
 /**
- * 실제 파일(src/core/evm/provider.ts)은 공개 RPC에 연결한다. 이 가짜 노드는 core가 쓰는 메서드만
+ * 실제 앱(src/platform/services.ts의 createRpcProvider)은 공개 RPC에 연결한다. 이 가짜 노드는 core가 쓰는 메서드만
  * 흉내 내고, 잔액·nonce·확정 시간을 메모리에서 계산한다. 수수료 계산·서명·전송 로직은 실제 core 코드가 그대로 돈다.
  */
 class FakeNode {
@@ -121,13 +120,7 @@ class FakeNode {
   }
 }
 
-const nodes = new Map<string, FakeNode>();
-
-export const getProvider: typeof Real.getProvider = (network) => {
-  let node = nodes.get(network.id);
-  if (!node) {
-    node = new FakeNode(network);
-    nodes.set(network.id, node);
-  }
-  return node as unknown as JsonRpcProvider;
-};
+/** 네트워크마다 하나씩 만들어 core/evm/provider가 캐시한다 */
+export function createFakeNode(network: NetworkConfig): JsonRpcProvider {
+  return new FakeNode(network) as unknown as JsonRpcProvider;
+}

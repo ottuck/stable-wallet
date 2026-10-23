@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { parseAddressQr } from '@/core/address';
 import { CameraIcon, CrossIcon } from '@/features/icons';
@@ -13,6 +13,7 @@ import {
   useSafeAreaInsets,
   type BarcodeScanningResult,
 } from '@/platform/ui';
+import { openSettings } from '@/platform/services';
 
 /**
  * 주소 QR을 읽어 보내기 화면의 받는 주소로 넘긴다.
@@ -82,7 +83,7 @@ export default function Scan() {
           </View>
           <View style={styles.promptActions}>
             {permission && !permission.canAskAgain ? (
-              <Button title={t.scan.openSettings} onPress={() => void Linking.openSettings()} />
+              <Button title={t.scan.openSettings} onPress={() => void openSettings()} />
             ) : (
               <Button title={t.scan.allowCamera} onPress={() => void requestPermission()} />
             )}

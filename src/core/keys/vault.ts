@@ -1,6 +1,6 @@
-import * as SecureStore from 'expo-secure-store';
 import type { HDNodeWallet } from 'ethers';
 
+import { secureStore } from '../../platform/services';
 import { WalletError } from '../errors';
 import { deriveWallet, isValidMnemonic, normalizeMnemonic } from './mnemonic';
 
@@ -8,19 +8,13 @@ import { deriveWallet, isValidMnemonic, normalizeMnemonic } from './mnemonic';
 const MNEMONIC_KEY = 'wallet.mnemonic';
 const ADDRESS_KEY = 'wallet.address';
 
-const SECRET: SecureStore.SecureStoreOptions = {
-  keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-  requireAuthentication: true,
-  authenticationPrompt: '지갑 잠금 해제',
-};
-
-// 주소는 공개 정보라 인증 없이 읽는다. 앱을 지워도 Keychain에 남아 재설치 때 지갑을 찾는 데 쓴다.
-const PUBLIC: SecureStore.SecureStoreOptions = {
-  keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-};
+// 복구 문구는 읽을 때마다 Face ID를 거친다. 주소는 공개 정보라 인증 없이 읽는다.
+// 둘 다 앱을 지워도 Keychain에 남아 재설치 때 지갑을 찾는 데 쓴다.
+const SECRET = true;
+const PUBLIC = false;
 
 export function loadAddress(): Promise<string | null> {
-  return SecureStore.getItemAsync(ADDRESS_KEY, PUBLIC);
+  return secureStore.get(ADDRESS_KEY, PUBLIC);
 }
 
 /** 복구 문구를 저장하고 주소를 돌려준다. 이미 지갑이 있으면 덮어쓰지 않는다. */
@@ -28,11 +22,11 @@ export async function saveWallet(input: string): Promise<string> {
   const phrase = normalizeMnemonic(input);
   if (!isValidMnemonic(phrase)) throw new WalletError('InvalidMnemonic');
   if (await loadAddress()) throw new WalletError('WalletExists');
-  if (!SecureStore.canUseBiometricAuthentication()) throw new WalletError('BiometricsUnavailable');
+  if (!secureStore.canUseBiometrics()) throw new WalletError('BiometricsUnavailable');
 
   const { address } = deriveWallet(phrase);
-  await SecureStore.setItemAsync(MNEMONIC_KEY, phrase, SECRET);
-  await SecureStore.setItemAsync(ADDRESS_KEY, address, PUBLIC);
+  await secureStore.set(MNEMONIC_KEY, phrase, SECRET);
+  await secureStore.set(ADDRESS_KEY, address, PUBLIC);
   return address;
 }
 
@@ -40,7 +34,7 @@ export async function saveWallet(input: string): Promise<string> {
 export async function withSigner<T>(fn: (signer: HDNodeWallet) => Promise<T>): Promise<T> {
   let phrase: string | null;
   try {
-    phrase = await SecureStore.getItemAsync(MNEMONIC_KEY, SECRET);
+    phrase = await secureStore.get(MNEMONIC_KEY, SECRET);
   } catch (cause) {
     throw new WalletError('AuthCancelled', { cause });
   }
@@ -49,6 +43,6 @@ export async function withSigner<T>(fn: (signer: HDNodeWallet) => Promise<T>): P
 }
 
 export async function deleteWallet(): Promise<void> {
-  await SecureStore.deleteItemAsync(MNEMONIC_KEY, SECRET);
-  await SecureStore.deleteItemAsync(ADDRESS_KEY, PUBLIC);
+  await secureStore.remove(MNEMONIC_KEY, SECRET);
+  await secureStore.remove(ADDRESS_KEY, PUBLIC);
 }

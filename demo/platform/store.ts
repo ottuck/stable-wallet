@@ -1,13 +1,13 @@
 import type { NetworkId } from '@/core/config/networks';
 import { tokensOn } from '@/core/config/tokens';
+import type * as RealDb from '@/core/db';
 import type * as Real from '@/core/history';
 import { parseUnits } from 'ethers';
 
 import { DEMO, fakeHash } from '../data';
+import { mode } from '../mode';
 
-export type { TxStatus, WalletTx } from '@/core/history';
-
-// 실제 파일(src/core/history.ts)은 SQLite에 저장한다. 데모는 메모리 배열이고 새로고침하면 처음으로 돌아간다.
+// 실제 앱(src/platform/store.ts)은 기기 SQLite에 저장한다. 데모는 메모리이고 새로고침하면 처음으로 돌아간다.
 const txs: Real.WalletTx[] = [];
 const seeded = new Set<string>();
 
@@ -66,3 +66,20 @@ export const hasSentTo: typeof Real.hasSentTo = (fromAddress, toAddress) =>
 
 export const listPendingTxs: typeof Real.listPendingTxs = () =>
   txs.filter((t) => t.status === 'pending');
+
+// 이 설치에서 연 적이 있는지(?state=found면 재설치 직후처럼 없다고 답한다)와 앱 설정
+let installed = mode !== 'found';
+
+export const isInstalled: typeof RealDb.isInstalled = () => installed;
+
+export const markInstalled: typeof RealDb.markInstalled = () => {
+  installed = true;
+};
+
+const meta = new Map<string, string>();
+
+export const getMeta: typeof RealDb.getMeta = (key) => meta.get(key) ?? null;
+
+export const setMeta: typeof RealDb.setMeta = (key, value) => {
+  meta.set(key, value);
+};

@@ -1,5 +1,6 @@
-import * as Clipboard from 'expo-clipboard';
 import { useEffect, useState } from 'react';
+
+import { writeClipboard } from '@/platform/services';
 
 import { CheckIcon, CopyIcon } from './icons';
 import { useT } from './i18n';
@@ -32,7 +33,7 @@ export function CopyButton({
       label={copied ? t.common.copied : (label ?? t.common.copyAddress)}
       filled={filled}
       onPress={() => {
-        void Clipboard.setStringAsync(value);
+        void writeClipboard(value);
         setCopied(true);
       }}
     >

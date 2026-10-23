@@ -11,6 +11,9 @@ export const DEMO = {
    */
   phrase: Mnemonic.fromEntropy(keccak256(toUtf8Bytes('henry-wallet-demo')).slice(0, 34)).phrase,
 
+  /** 위 문구의 entropy(16바이트). 데모의 "난수"는 늘 이 값이라 새 지갑도 같은 문구가 된다 */
+  entropy: keccak256(toUtf8Bytes('henry-wallet-demo')).slice(0, 34),
+
   /** 붙여넣기·QR 스캔이 채워 주는 받는 주소(EIP-55 예시 주소) */
   recipient: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
 
