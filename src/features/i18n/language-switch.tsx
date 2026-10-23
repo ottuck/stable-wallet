@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { ActionSheetIOS, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { Dropdown, DropdownItem } from '@/features/dropdown';
-import { ChevronDownIcon, GlobeIcon } from '@/features/icons';
-import { Label, useColors, useThemed, type Palette } from '@/features/ui';
+import { GlobeIcon } from '@/features/icons';
+import { useColors, useThemed, type Palette } from '@/features/ui';
 
 import { useLanguage, useLocale, useT, type Locale } from './index';
 
 const LOCALES: Locale[] = ['ko', 'en'];
 
 /**
- * 화면 맨 위 오른쪽의 작은 언어 버튼(지구 아이콘 · KO). 네트워크 버튼처럼 iOS는 액션 시트,
+ * 화면 맨 위 오른쪽의 동그란 언어 버튼(지구 아이콘만, 지금 언어는 화면 글자로 안다). 네트워크 버튼처럼 iOS는 액션 시트,
  * 그 밖은 버튼 아래에 펼쳐지는 목록으로 고른다. 고른 값은 기기에 저장된다.
  */
 export function LanguageSwitch() {
@@ -45,13 +45,7 @@ export function LanguageSwitch() {
         onPress={press}
         style={styles.button}
       >
-        <GlobeIcon size={16} color={c.text} />
-        <Label bold size={13}>
-          {locale.toUpperCase()}
-        </Label>
-        <View style={open && { transform: [{ rotate: '180deg' }] }}>
-          <ChevronDownIcon size={14} color={c.muted} />
-        </View>
+        <GlobeIcon size={20} color={c.text} />
       </Pressable>
 
       <Dropdown open={open} onClose={() => setOpen(false)} align="right">
@@ -74,12 +68,11 @@ export function LanguageSwitch() {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     button: {
-      minHeight: 44,
-      paddingHorizontal: 14,
+      width: 44,
+      height: 44,
       borderRadius: 22,
       backgroundColor: c.segment,
-      flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      justifyContent: 'center',
     },
   });
