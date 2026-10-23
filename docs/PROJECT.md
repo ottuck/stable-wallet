@@ -169,6 +169,8 @@ D안 "투명한 거래"(디자인 캔버스: claude.ai/artifact/N8kxDH1edd99Y2QP
 
 나머지(RPC, 서명, 화면)는 테스트넷에서 `ROADMAP.md`의 체크리스트로 확인한다. 테스트를 늘리지 않는다.
 
+CI(`.github/workflows/ci.yml`의 `check`)는 모든 PR에서 돈다. 문서(`docs/`, `*.md`)만 바뀌었으면 설치·검사를 건너뛰고 바로 통과하고, 아니면 `pnpm check`를 돌린다. 같은 PR에 다시 push하면 앞선 실행은 취소한다.
+
 ## RPC
 
 기본은 무료 공개 RPC. 키가 있는 provider를 쓰면 키는 앱에 들어가므로 공개된 값으로 보고, provider 쪽에서 허용 범위를 제한한다. RPC는 잔액을 속일 수는 있어도 키를 훔칠 수는 없다(서명은 기기에서만).
