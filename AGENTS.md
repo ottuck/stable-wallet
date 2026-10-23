@@ -37,7 +37,7 @@ pnpm dlx expo-doctor       # 의존성·설정 진단
 - `core`는 `app`/`features`/React를 import하지 않는다. secure-store는 `core/keys`만 쓴다.
 - 경로 별칭 `@/` = `src/`.
 - 화면 문구는 `src/features/i18n/messages.ts`에만 둔다(한국어 `ko`가 기준, 영어 `en`은 같은 모양). 컴포넌트에 문구를 직접 쓰지 않고 `useT()`로 읽는다. 문구를 더하면 두 언어를 같이 더한다.
-- `demo/`는 전시용 가짜 데이터와 가짜 경계만 둔다(무엇을 바꾸는지는 `demo/overrides.js`). `src`는 `demo`를 import하지 않는다. 바꾸는 파일의 export를 바꾸면 `demo/stubs`도 같이 고친다.
+- `demo/`는 전시용 가짜 데이터와 가짜 경계만 둔다(무엇을 바꾸는지는 `demo/overrides.js`). `src`는 `demo`를 import하지 않는다(lint 에러). 바꾸는 파일의 export를 바꾸면 `demo/stubs`도 같이 고치고, 옮기거나 이름을 바꾸면 `demo/overrides.js` 목록도 고친다(목록의 파일이 없으면 데모가 시작하지 않는다).
 - 공개 데모는 실제 돈과 닿으면 안 된다: 진짜 복구 문구를 만들거나 입력받지 않고, 찍히는 주소 QR·주소 복사·공유를 내보내지 않으며, 카메라·클립보드를 쓰지 않는다. 이 규칙을 깨는 화면을 더하면 `demo/overrides.js`에서 막는다.
 
 ## 문서 갱신
