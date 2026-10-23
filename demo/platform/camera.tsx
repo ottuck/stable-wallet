@@ -4,7 +4,8 @@ import QRCode from 'react-native-qrcode-svg';
 
 import { DEMO } from '../data';
 
-// expo-camera 대신. 공개 데모가 방문자에게 카메라 권한을 묻지 않도록 카메라는 켜지 않는다.
+// expo-camera의 CameraView·useCameraPermissions 대신(demo/platform/ui.tsx가 내보낸다).
+// 공개 데모가 방문자에게 카메라 권한을 묻지 않도록 카메라는 켜지 않는다.
 // 어두운 뷰파인더에 예시 QR이 비친 것처럼 보여주고, 잠깐 뒤 예시 받는 주소를 읽은 것처럼 넘긴다.
 // 화면의 QR에는 주소가 아니라 안내 글이 담겨 있어 다른 기기로 찍어도 송금 주소가 되지 않는다.
 

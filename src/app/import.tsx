@@ -4,9 +4,8 @@ import { StyleSheet } from 'react-native';
 import { errorMessage } from '@/features/error-message';
 import { useT } from '@/features/i18n';
 import { Button, Label, type Palette, Screen, useColors, useThemed } from '@/features/ui';
-import { useSecretScreen } from '@/features/use-secret-screen';
-import { PhraseInput } from '@/features/wallet/phrase-input';
 import { useWallet } from '@/features/wallet/store';
+import { PhraseInput, useSecretScreen } from '@/platform/ui';
 
 export default function Import() {
   const t = useT();
