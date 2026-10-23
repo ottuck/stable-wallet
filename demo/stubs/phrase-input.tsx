@@ -6,12 +6,10 @@ import { fonts, useColors } from '@/features/ui';
 import { DEMO } from '../data';
 import { useDemoText } from '../text';
 
-// 가져오기 화면(src/app/import.tsx)이 부르는 react-native. 입력란만 바꾸고 나머지는 그대로다.
+// src/features/wallet/phrase-input.ts 대신. 가져오기 화면의 복구 문구 입력란이다.
 // 공개 사이트에 복구 문구 입력란이 있으면 방문자가 진짜 문구를 넣을 수 있고 피싱으로 분류될 수 있어서,
 // 입력은 받지 않고 예시 문구를 보여준 뒤 그 문구로 가져온다.
-export * from 'react-native';
-
-export function TextInput({ onChangeText, style }: TextInputProps) {
+export function PhraseInput({ onChangeText, style }: TextInputProps) {
   const c = useColors();
   const d = useDemoText();
 
@@ -34,5 +32,3 @@ export function TextInput({ onChangeText, style }: TextInputProps) {
     </View>
   );
 }
-
-export default TextInput;

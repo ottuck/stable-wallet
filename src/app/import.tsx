@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { StyleSheet, TextInput } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { errorMessage } from '@/features/error-message';
 import { useT } from '@/features/i18n';
 import { Button, Label, type Palette, Screen, useColors, useThemed } from '@/features/ui';
 import { useSecretScreen } from '@/features/use-secret-screen';
+import { PhraseInput } from '@/features/wallet/phrase-input';
 import { useWallet } from '@/features/wallet/store';
 
 export default function Import() {
@@ -47,7 +48,7 @@ export default function Import() {
       }
     >
       <Label style={{ lineHeight: 22 }}>{t.import.intro}</Label>
-      <TextInput
+      <PhraseInput
         value={phrase}
         onChangeText={setPhrase}
         multiline
