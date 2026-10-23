@@ -62,6 +62,7 @@ export const AlertIcon = icon(() => (
   </>
 ));
 export const ChevronDownIcon = icon(() => <Path d="M6 9l6 6 6-6" />);
+export const ChevronRightIcon = icon(() => <Path d="M9 6l6 6-6 6" />);
 export const ChevronLeftIcon = icon(() => <Path d="M15 6l-6 6 6 6" />);
 export const ArrowLeftIcon = icon(() => <Path d="M20 12H4M11 5l-7 7 7 7" />);
 export const CameraIcon = icon(() => (

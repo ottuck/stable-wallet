@@ -5,19 +5,19 @@ import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { formatAmount } from '@/core/amount';
 import { tokensOn } from '@/core/config/tokens';
 import type { AssetBalance } from '@/core/evm/balances';
-import type { WalletTx } from '@/core/history';
 import { withSigner } from '@/core/keys/vault';
 import { HenryCoin } from '@/features/brand';
 import { CopyButton } from '@/features/copy-button';
 import { errorMessage } from '@/features/error-message';
-import { openExplorer, shortAddress, shortHash } from '@/features/format';
-import { useRecentTxs } from '@/features/history/use-recent-txs';
 import { MENU_LAYER } from '@/features/dropdown';
+import { openExplorer, shortAddress } from '@/features/format';
+import { TxRow } from '@/features/history/tx-row';
+import { useRecentTxs } from '@/features/history/use-recent-txs';
 import { NetworkPicker } from '@/features/home/network-picker';
 import { useBalances } from '@/features/home/use-balances';
 import { useT } from '@/features/i18n';
 import { LanguageSwitch } from '@/features/i18n/language-switch';
-import { ClockIcon, ReceiveIcon, ScanIcon, SendIcon } from '@/features/icons';
+import { ChevronRightIcon, ReceiveIcon, ScanIcon, SendIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import {
   Address,
@@ -33,6 +33,9 @@ import {
 } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
 
+/** 홈에 보이는 보낸 거래 수. 더 있으면 "전체 보기"로 보낸 거래 화면을 연다 */
+const HOME_TXS = 5;
+
 export default function Home() {
   const c = useColors();
   const t = useT();
@@ -41,7 +44,10 @@ export default function Home() {
   const network = useNetwork((s) => s.network);
   const { balances, transferFee, error, refresh } = useBalances(network, address);
   const [refreshKey, setRefreshKey] = useState(0);
-  const txs = useRecentTxs(network, address, refreshKey);
+  // 하나 더 읽어서 홈에 다 못 보인 거래가 있는지 안다
+  const recent = useRecentTxs(network, address, refreshKey, HOME_TXS + 1);
+  const txs = recent.slice(0, HOME_TXS);
+  const more = recent.length > HOME_TXS;
 
   const reload = useCallback(() => {
     refresh();
@@ -59,7 +65,7 @@ export default function Home() {
     }, []),
   );
 
-  // 스테이블코인은 큰 잔액으로, 가스용 native는 따로
+  // 스테이블코인은 큰 잔액으로, 가스용 native는 그 아래 한 줄로
   const native = balances?.find((b) => !b.tokenAddress);
   const stables = tokensOn(network.id).map((token) => ({
     token,
@@ -103,24 +109,39 @@ export default function Home() {
           )}
         </View>
 
-        <View style={styles.actions}>
-          <Action label={t.home.send} primary onPress={() => router.push('/send')}>
-            <SendIcon size={22} color={c.onPrimary} strokeWidth={2.2} />
-          </Action>
-          <Action label={t.home.receive} onPress={() => router.push('/receive')}>
-            <ReceiveIcon size={22} color={c.accentText} strokeWidth={2.2} />
-          </Action>
-          <Action label={t.home.scan} onPress={() => router.push('/scan?from=home')}>
-            <ScanIcon size={22} color={c.accentText} strokeWidth={2.2} />
-          </Action>
-        </View>
+        {native && <GasLine balance={native} transferFee={transferFee} />}
       </Card>
 
-      {native && <GasCard balance={native} transferFee={transferFee} />}
+      <View style={styles.actions}>
+        <Action label={t.home.send} primary onPress={() => router.push('/send')}>
+          <SendIcon size={22} color={c.onPrimary} strokeWidth={2.2} />
+        </Action>
+        <Action label={t.home.receive} onPress={() => router.push('/receive')}>
+          <ReceiveIcon size={22} color={c.accentText} strokeWidth={2.2} />
+        </Action>
+        <Action label={t.home.scan} onPress={() => router.push('/scan?from=home')}>
+          <ScanIcon size={22} color={c.accentText} strokeWidth={2.2} />
+        </Action>
+      </View>
 
-      <Label bold size={14} style={{ paddingHorizontal: 4 }}>
-        {t.home.sentTxs}
-      </Label>
+      <View style={styles.sectionHead}>
+        <Label bold size={14}>
+          {t.home.sentTxs}
+        </Label>
+        {more && (
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push('/history')}
+            hitSlop={10}
+            style={styles.seeAll}
+          >
+            <Label size={13} color={c.accent}>
+              {t.home.seeAll}
+            </Label>
+            <ChevronRightIcon size={14} color={c.accent} strokeWidth={2.4} />
+          </Pressable>
+        )}
+      </View>
       <Card style={{ paddingVertical: 4, gap: 0 }}>
         {txs.length === 0 ? (
           <View style={styles.empty}>
@@ -135,14 +156,7 @@ export default function Home() {
             </Label>
           </View>
         ) : (
-          txs.map((tx, i) => (
-            <TxRow
-              key={tx.hash}
-              tx={tx}
-              last={i === txs.length - 1}
-              onPress={() => router.push({ pathname: '/tx', params: { hash: tx.hash } })}
-            />
-          ))
+          txs.map((tx, i) => <TxRow key={tx.hash} tx={tx} last={i === txs.length - 1} />)
         )}
       </Card>
 
@@ -175,7 +189,7 @@ function Action({
       style={({ pressed }) => [
         styles.action,
         {
-          backgroundColor: primary ? c.primary : c.accentSoft,
+          backgroundColor: primary ? c.primary : c.card,
           opacity: disabled ? 0.4 : pressed ? 0.7 : 1,
         },
       ]}
@@ -221,83 +235,45 @@ function TokenRow({
   );
 }
 
-function GasCard({ balance, transferFee }: { balance: AssetBalance; transferFee: bigint | null }) {
+/** 잔액 카드 맨 아래 한 줄: 가스용 native 잔액과, 지금 수수료로 ERC-20 전송을 몇 번 할 수 있는지(50번을 가득으로 본다) */
+function GasLine({ balance, transferFee }: { balance: AssetBalance; transferFee: bigint | null }) {
   const c = useColors();
   const t = useT();
   const styles = useThemed(makeStyles);
-  // 지금 수수료로 ERC-20 전송을 몇 번 할 수 있는지(50번을 가득으로 본다)
   const sends = transferFee ? Number(balance.raw / transferFee) : null;
+  const short = sends === 0;
   return (
-    <Card style={{ gap: 12 }}>
-      <View style={styles.assetRow}>
-        <View style={styles.assetName}>
-          <TokenIcon symbol={balance.symbol} size={32} />
-          <View style={{ gap: 2 }}>
-            <Label bold>{balance.symbol}</Label>
-            <Label muted size={12}>
-              {t.home.gasNote}
-            </Label>
-          </View>
-        </View>
-        <Label mono bold size={16}>
-          {formatAmount(balance.raw, balance.decimals, 4)}
+    <View style={styles.gasLine}>
+      <View style={styles.gasName}>
+        <TokenIcon symbol={balance.symbol} size={22} />
+        <Label mono bold size={14}>
+          {`${formatAmount(balance.raw, balance.decimals, 4)} ${balance.symbol}`}
+        </Label>
+        <Label muted size={12}>
+          {t.home.gasFor}
         </Label>
       </View>
       {sends !== null && (
-        <View style={styles.meterRow}>
-          <View style={styles.meter}>
-            <View
-              style={[
-                styles.meterFill,
-                {
-                  width: `${Math.min(sends / 50, 1) * 100}%`,
-                  backgroundColor: sends === 0 ? c.danger : networkColor(balance.symbol),
-                },
-              ]}
-            />
-          </View>
-          <Label muted size={12} color={sends === 0 ? c.danger : undefined}>
-            {sends === 0 ? t.home.gasShort : t.home.sendsLeft(sends > 999 ? '999+' : String(sends))}
+        <View style={styles.gasLeft}>
+          {!short && (
+            <View style={styles.meter}>
+              <View
+                style={[
+                  styles.meterFill,
+                  {
+                    width: `${Math.min(sends / 50, 1) * 100}%`,
+                    backgroundColor: networkColor(balance.symbol),
+                  },
+                ]}
+              />
+            </View>
+          )}
+          <Label muted={!short} bold={short} size={12} color={short ? c.danger : undefined}>
+            {short ? t.home.gasShort : t.home.sendsLeft(sends > 999 ? '999+' : String(sends))}
           </Label>
         </View>
       )}
-    </Card>
-  );
-}
-
-function TxRow({ tx, last, onPress }: { tx: WalletTx; last: boolean; onPress: () => void }) {
-  const c = useColors();
-  const t = useT();
-  const styles = useThemed(makeStyles);
-  return (
-    <Pressable
-      accessibilityRole="link"
-      onPress={onPress}
-      style={[styles.assetRow, { paddingVertical: 12 }, !last && styles.rowLine]}
-    >
-      <View style={{ gap: 4, flexShrink: 1 }}>
-        <Label bold>{`−${formatAmount(BigInt(tx.amount), tx.decimals, 2)} ${tx.symbol}`}</Label>
-        <Label mono muted size={12}>
-          {`→ ${shortAddress(tx.toAddress)} · ${shortHash(tx.hash)}`}
-        </Label>
-      </View>
-      {tx.status === 'pending' ? (
-        <View style={styles.status}>
-          <ClockIcon size={14} color={c.warn} strokeWidth={2.4} />
-          <Label bold size={13} color={c.warn}>
-            {t.home.pending}
-          </Label>
-        </View>
-      ) : tx.status === 'confirmed' ? (
-        <Label muted size={13}>
-          {t.home.date(new Date(tx.createdAt))}
-        </Label>
-      ) : (
-        <Label bold size={13} color={c.danger}>
-          {tx.status === 'failed' ? t.home.failed : t.home.dropped}
-        </Label>
-      )}
-    </Pressable>
+    </View>
   );
 }
 
@@ -343,7 +319,6 @@ function DevTools({ address }: { address: string }) {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    status: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     addressRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -351,20 +326,37 @@ const makeStyles = (c: Palette) =>
       marginRight: -10,
     },
     stables: { gap: 2 },
-    actions: { flexDirection: 'row', gap: 8 },
+    actions: { flexDirection: 'row', gap: 10 },
+    sectionHead: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 4,
+      marginTop: 4,
+    },
+    seeAll: { flexDirection: 'row', alignItems: 'center', gap: 2 },
     empty: { alignItems: 'center', gap: 6, paddingVertical: 20, paddingHorizontal: 8 },
     action: {
       flex: 1,
-      minHeight: 72,
-      borderRadius: 16,
+      minHeight: 76,
+      borderRadius: 18,
       alignItems: 'center',
       justifyContent: 'center',
       gap: 6,
     },
     assetRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    rowLine: { borderBottomWidth: 1, borderBottomColor: c.line },
     assetName: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
-    meterRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 44 },
-    meter: { flex: 1, height: 6, borderRadius: 3, backgroundColor: c.line },
-    meterFill: { height: 6, borderRadius: 3 },
+    gasLine: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 8,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderTopColor: c.line,
+    },
+    gasName: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
+    gasLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
+    meter: { width: 36, height: 4, borderRadius: 2, backgroundColor: c.line },
+    meterFill: { height: 4, borderRadius: 2 },
   });
