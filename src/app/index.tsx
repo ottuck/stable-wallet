@@ -108,7 +108,13 @@ export default function Home() {
           )}
         </View>
 
-        {native && <GasLine balance={native} transferFee={transferFee} />}
+        {/* 잔액을 읽는 중에도 자리를 지켜 아래 버튼·거래 목록이 움직이지 않게 한다 */}
+        <GasLine
+          symbol={network.native.symbol}
+          balance={native}
+          amount={native ? formatAmount(native.raw, native.decimals, 4) : error != null ? '—' : '…'}
+          transferFee={transferFee}
+        />
       </Card>
 
       <View style={styles.actions}>
@@ -235,18 +241,28 @@ function TokenRow({
 }
 
 /** 잔액 카드 맨 아래 한 줄: 가스용 native 잔액과, 지금 수수료로 ERC-20 전송을 몇 번 할 수 있는지 */
-function GasLine({ balance, transferFee }: { balance: AssetBalance; transferFee: bigint | null }) {
+function GasLine({
+  symbol,
+  balance,
+  amount,
+  transferFee,
+}: {
+  symbol: string;
+  balance: AssetBalance | undefined;
+  amount: string;
+  transferFee: bigint | null;
+}) {
   const c = useColors();
   const t = useT();
   const styles = useThemed(makeStyles);
-  const sends = transferFee ? Number(balance.raw / transferFee) : null;
+  const sends = balance && transferFee ? Number(balance.raw / transferFee) : null;
   const short = sends === 0;
   return (
     <View style={styles.gasLine}>
       <View style={styles.gasName}>
-        <TokenIcon symbol={balance.symbol} size={22} />
+        <TokenIcon symbol={symbol} size={22} />
         <Label mono bold size={14}>
-          {`${formatAmount(balance.raw, balance.decimals, 4)} ${balance.symbol}`}
+          {`${amount} ${symbol}`}
         </Label>
         <Label muted size={12}>
           {t.home.gasFor}
