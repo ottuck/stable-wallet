@@ -1,7 +1,6 @@
 import { formatUnits } from 'ethers';
-import { Linking } from 'react-native';
-
 import type { NetworkConfig } from '@/core/config/networks';
+import { openUrl } from '@/platform/services';
 
 export function shortAddress(address: string): string {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
@@ -26,5 +25,5 @@ export function formatTime(ms: number): string {
 }
 
 export function openExplorer(network: NetworkConfig, path: `tx/${string}` | `token/${string}`) {
-  void Linking.openURL(`${network.explorerUrl}/${path}`);
+  void openUrl(`${network.explorerUrl}/${path}`);
 }

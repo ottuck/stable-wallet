@@ -1,4 +1,3 @@
-import * as Clipboard from 'expo-clipboard';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { type ComponentRef, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
@@ -27,6 +26,7 @@ import {
   useThemed,
 } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
+import { readClipboard } from '@/platform/services';
 
 function tryParse<T>(fn: () => T): T | null {
   try {
@@ -97,7 +97,7 @@ export default function SendInput() {
 
   async function paste() {
     // 웹에서 권한을 거부했거나 클립보드가 비어 있으면 직접 입력으로 넘겨 막히지 않게 한다
-    const text = await Clipboard.getStringAsync().then(
+    const text = await readClipboard().then(
       (value) => value.trim(),
       () => '',
     );

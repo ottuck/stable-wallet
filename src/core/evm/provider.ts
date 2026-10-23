@@ -1,17 +1,15 @@
-import { JsonRpcProvider, Network } from 'ethers';
+import type { JsonRpcProvider } from 'ethers';
 
+import { createRpcProvider } from '../../platform/services';
 import type { NetworkConfig, NetworkId } from '../config/networks';
 
-// 네트워크(RPC)에 닿는 유일한 지점. 데모(demo/)는 이 파일만 가짜 provider로 바꾼다.
+// 네트워크마다 RPC 연결 하나를 만들어 같이 쓴다. 연결 자체는 platform이 만든다(웹 데모는 가짜 노드).
 const providers = new Map<NetworkId, JsonRpcProvider>();
 
 export function getProvider(network: NetworkConfig): JsonRpcProvider {
   let provider = providers.get(network.id);
   if (!provider) {
-    // chainId를 고정해 매 요청마다 eth_chainId를 부르지 않는다. 서명 전에는 따로 확인한다.
-    provider = new JsonRpcProvider(network.rpcUrl, network.chainId, {
-      staticNetwork: Network.from(network.chainId),
-    });
+    provider = createRpcProvider(network);
     providers.set(network.id, provider);
   }
   return provider;

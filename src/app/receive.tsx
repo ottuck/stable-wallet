@@ -5,7 +5,6 @@ import { CopyButton } from '@/features/copy-button';
 import { useT } from '@/features/i18n';
 import { AlertIcon, ShareIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
-import { Share } from '@/features/share';
 import {
   Address,
   Card,
@@ -18,6 +17,7 @@ import {
   useThemed,
 } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
+import { shareText } from '@/platform/services';
 import { QRCode } from '@/platform/ui';
 
 export default function Receive() {
@@ -55,7 +55,7 @@ export default function Receive() {
             <IconButton
               label={t.common.shareAddress}
               filled
-              onPress={() => void Share.share({ message: address })}
+              onPress={() => void shareText(address)}
             >
               <ShareIcon size={18} />
             </IconButton>
