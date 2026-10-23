@@ -2,15 +2,13 @@ import { useState } from 'react';
 import { ActionSheetIOS, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { activeNetworks } from '@/core/config/networks';
+import { Dropdown, DropdownItem } from '@/features/dropdown';
 import { useT } from '@/features/i18n';
-import { CheckIcon, ChevronDownIcon } from '@/features/icons';
+import { ChevronDownIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
 import { Label, networkColor, useColors, useThemed, type Palette } from '@/features/ui';
 
-/**
- * 홈 왼쪽 위의 네트워크 버튼. iOS는 시스템 액션 시트로, 그 밖(웹·Android)은 버튼 아래에 펼쳐지는 목록으로 고른다.
- * 목록이 다음 카드 위로 겹쳐 보이도록 부모 줄에 zIndex를 준다(MENU_LAYER).
- */
+/** 홈 왼쪽 위의 네트워크 버튼. iOS는 시스템 액션 시트로, 그 밖(웹·Android)은 버튼 아래에 펼쳐지는 목록으로 고른다. */
 export function NetworkPicker() {
   const c = useColors();
   const t = useT();
@@ -33,7 +31,8 @@ export function NetworkPicker() {
   }
 
   return (
-    <View>
+    // 펼친 쪽이 옆 버튼보다 위에 오게 해서 바깥 누르기가 옆 버튼에도 먹게 한다
+    <View style={open && { zIndex: 1 }}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t.home.networkLabel(network.name)}
@@ -48,45 +47,23 @@ export function NetworkPicker() {
         </View>
       </Pressable>
 
-      {open && (
-        <>
-          {/* 바깥을 누르면 닫는다 */}
-          <Pressable
-            accessibilityLabel={t.common.cancel}
-            onPress={() => setOpen(false)}
-            style={styles.backdrop}
+      <Dropdown open={open} onClose={() => setOpen(false)}>
+        {activeNetworks.map((n) => (
+          <DropdownItem
+            key={n.id}
+            label={n.name}
+            selected={n.id === network.id}
+            left={<View style={[styles.dot, { backgroundColor: networkColor(n.native.symbol) }]} />}
+            onPress={() => {
+              setNetwork(n);
+              setOpen(false);
+            }}
           />
-          <View accessibilityRole="menu" style={styles.menu}>
-            {activeNetworks.map((n) => {
-              const selected = n.id === network.id;
-              return (
-                <Pressable
-                  key={n.id}
-                  accessibilityRole="menuitem"
-                  accessibilityState={{ selected }}
-                  onPress={() => {
-                    setNetwork(n);
-                    setOpen(false);
-                  }}
-                  style={({ pressed }) => [styles.item, pressed && { backgroundColor: c.soft }]}
-                >
-                  <View style={[styles.dot, { backgroundColor: networkColor(n.native.symbol) }]} />
-                  <Label bold={selected} style={{ flex: 1 }}>
-                    {n.name}
-                  </Label>
-                  {selected && <CheckIcon size={16} color={c.accent} strokeWidth={2.4} />}
-                </Pressable>
-              );
-            })}
-          </View>
-        </>
-      )}
+        ))}
+      </Dropdown>
     </View>
   );
 }
-
-/** 목록을 펼친 줄이 아래 카드보다 위에 그려지게 하는 zIndex */
-export const MENU_LAYER = { zIndex: 10 };
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
@@ -103,24 +80,4 @@ const makeStyles = (c: Palette) =>
       gap: 8,
     },
     dot: { width: 10, height: 10, borderRadius: 5 },
-    backdrop: { position: 'absolute', top: -200, left: -200, width: 2000, height: 2000 },
-    menu: {
-      position: 'absolute',
-      top: 50,
-      left: 0,
-      minWidth: 220,
-      paddingVertical: 6,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: c.border,
-      backgroundColor: c.card,
-      boxShadow: '0 10px 30px rgba(15,17,21,0.14)',
-    },
-    item: {
-      minHeight: 44,
-      paddingHorizontal: 14,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-    },
   });
