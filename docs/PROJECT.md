@@ -57,20 +57,22 @@ iOS Keychain은 앱을 지워도 남고 SQLite는 지워진다. SQLite가 새로
 src/
 ├── app/            # 화면(Expo Router). 로직은 features/core를 부른다
 ├── features/       # 화면 단위 UI·hook: wallet, home, send, history, i18n(문구·언어), theme(색·글꼴)
-├── platform/       # 기기와 닿는 경계. ui.ts: 카메라·QR·복구 문구 입력란·화면 캡처 차단·safe area
+├── platform/       # 기기·바깥과 닿는 유일한 경계(웹 데모는 이 두 파일만 바꿔 끼운다)
+│   ├── services.ts # 보안 저장소·난수·RPC 연결·저장소·클립보드·공유·링크. React 없음(core도 씀)
+│   ├── store.ts    # 거래 기록·설정의 SQLite 구현(services가 다시 내보낸다)
+│   └── ui.ts       # 카메라·QR·복구 문구 입력란·화면 캡처 차단·safe area
 └── core/           # React를 모르는 지갑 로직
     ├── config/     # networks.ts, tokens.ts
-    ├── keys/       # mnemonic 생성·검증·파생, secure-store 접근 (mnemonic을 만지는 유일한 곳)
-    ├── evm/        # provider(RPC 연결 지점), 잔액, 수수료, 전송, receipt
+    ├── keys/       # mnemonic 생성·검증·파생, 보안 저장소 접근 (mnemonic을 만지는 유일한 곳)
+    ├── evm/        # provider(RPC 연결 캐시), 잔액, 수수료, 전송, receipt
     ├── transfer.ts # 거래 흐름: 서명 → 저장 → 전송 → 확인(서버가 없어 앱 안에서 이어 붙이는 지점)
-    ├── db.ts · history.ts  # SQLite tx 저장소
+    ├── db.ts · history.ts  # 설치 표시·설정과 거래 기록의 모양(저장은 platform)
     └── errors.ts   # WalletError(code)
 
-demo/               # 전시용 웹 데모(pnpm demo). 가짜 데이터와 가짜 경계만 둔다
-├── data.ts         # 가짜 값은 모두 여기(잔액, 거래 내역, 수수료, 대기 시간)
-├── platform/       # src/platform 대신 쓰는 가짜(ui.tsx, 가짜 카메라 camera.tsx)
-├── stubs/          # 저장소(db·history)·키 보관(vault)·RPC(provider)를 메모리로 바꾼 파일
-├── overrides.js    # Metro가 실제 파일 대신 stubs를 쓰게 하는 목록
+demo/               # 전시용 웹 데모(pnpm demo). 가짜 데이터와 src/platform의 가짜 구현만 둔다
+├── data.ts         # 가짜 값은 모두 여기(예시 문구, 잔액, 거래 내역, 수수료, 대기 시간)
+├── platform/       # services.ts·ui.tsx(바꿔 끼우는 두 파일), store.ts(메모리 저장소), fake-node.ts(가짜 RPC), camera.tsx(가짜 카메라)
+├── overrides.js    # Metro가 src/platform 두 파일을 demo/platform으로 바꿔 끼운다
 └── entry.tsx · phone-frame.tsx  # 웹 진입점과 휴대폰 틀
 ```
 
@@ -78,7 +80,7 @@ demo/               # 전시용 웹 데모(pnpm demo). 가짜 데이터와 가�
 - 지갑 로직은 화면에 두지 않는다. 서버가 없어도 앱 안에서 "서비스(core)"와 "화면(app·features)"을 나눈다: 거래를 이어 붙이는 순서·불변식(서명 → 전송 전 pending 저장 → 전송 → receipt 반영)은 `core/transfer.ts`에만 두고, 화면은 그 함수를 부르고 결과를 그리기만 한다. 새 흐름(예: 다른 체인)도 같은 방식으로 core에 둔다.
 - 체인 코드는 `core/evm`에만 둔다. Bitcoin을 하게 되면 `core/btc`를 같은 모양(잔액·수수료·전송·주소 검증)으로 더하고, 지금은 공통 인터페이스를 미리 만들지 않는다.
 - History는 `core/history` 함수로만 접근한다(나중에 동기화를 붙이더라도 지갑 로직은 모른다).
-- 데모: `pnpm demo`는 `demo/overrides.js` 목록에 있는 곳만 `demo/stubs`로 바꿔 웹에서 연다. 앱 바깥과 닿는 경계(`core/db`, `core/history`, `core/keys/vault`, `core/evm/provider`, 웹에 없는 스크린샷 차단과 safe area — 휴대폰 틀 안에서는 iPhone과 같은 아래 여백 34 — `platform/ui`)와, 공개 웹 데모에서 막아야 하는 것들이다: 새 지갑 문구는 무작위가 아니라 공개된 예시 문구(`core/keys/mnemonic`), 가져오기는 입력란 대신 예시 문구(`platform/ui`의 `PhraseInput`), 카메라는 켜지 않고 어두운 뷰파인더에 예시 QR이 비친 모습을 보인 뒤 잠깐 지나 예시 받는 주소를 읽은 것처럼 넘긴다(`platform/ui`의 `CameraView`), 클립보드는 읽지도 쓰지도 않음(붙여넣기는 예시 받는 주소, 복사는 안내 — `expo-clipboard`), 받기·스캔 화면의 QR은 모양은 그대로지만 주소가 아닌 안내 글을 담아 찍어도 송금 주소가 되지 않게(`platform/ui`의 `QRCode`), 받기 공유는 안내(`features/share`), 가짜 거래의 탐색기 링크는 안내(토큰 컨트랙트 링크는 실제로 연다 — `features/format`의 `openExplorer`). 웹 스크롤바는 휴대폰처럼 숨기고(`demo/entry.tsx`), 화면 위에는 늘 회색 안내 줄("예시 데이터로 보는 데모예요…")이 있어 화면 안에는 데모 표시를 따로 두지 않고, 서명할 때 Face ID 장면을 보여준다(`demo/overlay.tsx`). 데모에만 나오는 문구는 `demo/text.ts`에 둔다. 수수료 계산·서명·전송 로직은 실제 코드가 그대로 돈다. `src`는 `demo`를 import하지 않고, 가짜 값은 `demo/data.ts`에만 둔다. 목록의 앱 파일·패키지·가짜 파일이 하나라도 없으면 Metro가 시작할 때 멈춘다(옮긴 뒤 조용히 진짜 모듈이 도는 것을 막는다). `src`에서 `demo`를 import하면 lint 에러다. 바꾸는 단위는 늘 파일이다(Metro는 해석 결과를 같은 폴더끼리 나눠 써서 "이 화면에서 부를 때만" 같은 조건은 옆 화면으로 샌다). 화면 하나의 부품만 바꾸려면 그 부품을 작은 파일로 뺀다. 바꾼 파일의 export가 바뀌면 stub도 같이 고친다(stub이 실제 함수 타입을 따라 typecheck가 알려준다). 주소창 `?state=empty|found|error`로 시작 화면을 고른다. 키는 페이지 메모리에만 있고, 문구가 고정이라 새로고침해도 같은 주소다.
+- 데모: `pnpm demo`(환경 변수 `STABLE_WALLET_DEMO=1`)일 때만 `metro.config.js`가 `demo/overrides.js`를 켜고, 번들을 만들 때 `src/platform/services.ts`·`ui.ts`를 `demo/platform/services.ts`·`ui.tsx`로 바꿔 끼운다. 앱 코드에는 데모 분기가 없고(앱 빌드에는 demo 파일이 들어가지 않는다), 지갑 규칙(문구 검증·주소 파생·거래 순서와 저장·수수료·서명)과 화면은 실제 코드가 그대로 돈다. 가짜가 하는 일: 보안 저장소는 페이지 메모리(Face ID가 필요한 읽기에서 확인 장면), 난수는 늘 공개된 예시 문구의 entropy라 새 지갑도 같은 문구, RPC는 메모리에서 잔액·nonce·확정을 계산하는 가짜 노드, 거래 기록·설정은 메모리, 클립보드는 읽지도 쓰지도 않음(붙여넣기는 예시 받는 주소, 복사는 안내), 공유는 안내, 가짜 거래의 탐색기 링크는 안내(토큰 컨트랙트 링크는 실제로 연다), 카메라는 켜지 않고 어두운 뷰파인더에 예시 QR이 비친 모습을 보인 뒤 예시 받는 주소를 읽은 것처럼 넘김, QR은 모양은 그대로지만 주소가 아닌 안내 글을 담아 찍어도 송금 주소가 되지 않음, 복구 문구 입력란 대신 예시 문구, 스크린샷 차단 없음, safe area는 휴대폰 틀 안에서 iPhone과 같은 아래 여백 34. 처음부터 지갑이 있는 상태면 `demo/entry.tsx`가 예시 문구로 실제 `saveWallet`을 불러 지갑을 만든 뒤 앱을 연다. 웹 스크롤바는 휴대폰처럼 숨기고(`demo/entry.tsx`), 화면 위에는 늘 회색 안내 줄("예시 데이터로 보는 데모예요…")이 있어 화면 안에는 데모 표시를 따로 두지 않는다(`demo/overlay.tsx`). 데모에만 나오는 문구는 `demo/text.ts`, 가짜 값은 `demo/data.ts`에만 둔다. 빠뜨리지 않게: 기기 패키지·`Share`·`Linking`·`randomBytes`는 `src/platform` 밖에서 import하면 lint 에러라 새 화면도 platform을 거치고, `src`에서 `demo`를 import해도 lint 에러, 바꿔 끼울 파일이 없으면 Metro가 시작할 때 멈춘다. 바꾸는 단위는 늘 파일이다(Metro는 해석 결과를 같은 폴더끼리 나눠 써서 "이 화면에서 부를 때만" 같은 조건은 옆 화면으로 샌다). 가짜 구현은 `typeof Real.x`로 실제 타입을 따라 typecheck가 어긋남을 알려준다. 주소창 `?state=empty|found|error`로 시작 화면을 고르고, 문구가 고정이라 새로고침해도 같은 주소다.
 - 공개 데모: `pnpm demo:build`가 같은 데모를 정적 파일(`dist/`)로 만든다. 공개 빌드는 `?state=`를 무시하고 늘 지갑이 있는 홈에서 시작한다(지갑 만들기·가져오기는 보이지 않는다). Cloudflare Pages(프로젝트 `henry-wallet`, 빌드 명령 `pnpm demo:build`, 출력 `dist`, 환경 변수 `NODE_VERSION=24`·`PNPM_VERSION=12.6.0`)가 `main`이 바뀔 때마다 빌드해 `wallet.portfolio-hub.dev`로 내보낸다(빌드 감시 경로에서 `docs/*`·`*.md`를 빼서 문서만 바뀐 커밋·PR은 빌드하지 않는다). 결과에 `404.html`이 없어 Pages가 없는 경로를 `index.html`로 보낸다. Pages는 경로에 `node_modules`가 든 파일을 올리지 않아서, `demo:build`가 패키지 자산(폰트·헤더 아이콘)을 `dist/assets/vendor`로 옮기고 번들 안 경로를 고친다.
 
 ### Config
