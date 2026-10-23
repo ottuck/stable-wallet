@@ -100,6 +100,8 @@ Before anything is signed, the app checks that the address is valid, that it is 
 
 Henry Wallet does a few things and tries to do them clearly. It has one account per wallet and does not connect to websites or apps, swap coins, or run any server of its own.
 
+It is also a learning project, so the home screen is one page on purpose: your stablecoins, the coin that pays the fees and your recent payments sit together, so you can see how they relate. A wallet built as a product would split these up, with the fee coin as one more row in the list and payment history on its own tab.
+
 ## Disclaimer
 
 This is an experimental personal wallet built for learning. It has not been audited. Use test networks or small amounts only, and do not keep significant funds in it.
