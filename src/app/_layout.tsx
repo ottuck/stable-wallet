@@ -67,6 +67,7 @@ export default function RootLayout() {
           />
           <Stack.Screen name="receive" options={withHomeBack(t.nav.receive)} />
           <Stack.Screen name="tx" options={withHomeBack(t.nav.tx)} />
+          <Stack.Screen name="history" options={withHomeBack(t.nav.history)} />
           <Stack.Screen
             name="scan"
             options={{ headerShown: false, presentation: 'fullScreenModal' }}
