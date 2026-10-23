@@ -2,6 +2,7 @@ import { router, Stack } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { HenryMark } from '@/features/brand';
+import { MENU_LAYER } from '@/features/dropdown';
 import { useT } from '@/features/i18n';
 import { LanguageSwitch } from '@/features/i18n/language-switch';
 import { EyeIcon, FaceIdIcon, ShieldIcon } from '@/features/icons';
@@ -21,7 +22,7 @@ export default function Welcome() {
     >
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={styles.top}>
+      <View style={[styles.top, MENU_LAYER]}>
         <LanguageSwitch />
       </View>
 

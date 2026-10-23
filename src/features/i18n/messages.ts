@@ -22,6 +22,8 @@ export const ko = {
     copied: '복사됨',
     shareAddress: '주소 공유',
     language: '언어',
+    // 언어 이름은 화면 언어와 상관없이 그 언어로 적는다
+    languageName: { ko: '한국어', en: 'English' },
   },
   welcome: {
     tagline: '내가 직접 보관하는 스테이블코인 지갑',
@@ -221,6 +223,7 @@ export const en: Messages = {
     copied: 'Copied',
     shareAddress: 'Share address',
     language: 'Language',
+    languageName: { ko: '한국어', en: 'English' },
   },
   welcome: {
     tagline: 'A self-custody wallet for stablecoins',

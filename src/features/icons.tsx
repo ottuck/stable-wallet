@@ -41,6 +41,12 @@ export const ReceiveIcon = icon(() => <Path d="M17 7L7 17M16 17H7V8" />);
 export const ScanIcon = icon(() => (
   <Path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16" />
 ));
+export const GlobeIcon = icon(() => (
+  <>
+    <Circle cx={12} cy={12} r={9} />
+    <Path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" />
+  </>
+));
 export const CheckIcon = icon(() => <Path d="M5 12l5 5 9-10" />);
 export const CrossIcon = icon(() => <Path d="M6 6l12 12M18 6L6 18" />);
 export const ClockIcon = icon(() => (
