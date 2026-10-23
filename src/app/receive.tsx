@@ -1,4 +1,4 @@
-import { Share, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 import { tokensOn } from '@/core/config/tokens';
@@ -6,6 +6,7 @@ import { CopyButton } from '@/features/copy-button';
 import { useT } from '@/features/i18n';
 import { AlertIcon, ShareIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
+import { Share } from '@/features/share';
 import {
   Address,
   Card,
