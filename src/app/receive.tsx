@@ -1,5 +1,4 @@
 import { StyleSheet, View } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
 
 import { tokensOn } from '@/core/config/tokens';
 import { CopyButton } from '@/features/copy-button';
@@ -19,6 +18,7 @@ import {
   useThemed,
 } from '@/features/ui';
 import { useWallet } from '@/features/wallet/store';
+import { QRCode } from '@/platform/ui';
 
 export default function Receive() {
   const c = useColors();

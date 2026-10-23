@@ -1,14 +1,18 @@
-import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { parseAddressQr } from '@/core/address';
 import { CameraIcon, CrossIcon } from '@/features/icons';
 import { useT } from '@/features/i18n';
 import { useNetwork } from '@/features/network-store';
 import { Button, Label, type Palette, useThemed } from '@/features/ui';
+import {
+  CameraView,
+  useCameraPermissions,
+  useSafeAreaInsets,
+  type BarcodeScanningResult,
+} from '@/platform/ui';
 
 /**
  * 주소 QR을 읽어 보내기 화면의 받는 주소로 넘긴다.

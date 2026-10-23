@@ -6,29 +6,23 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const src = path.join(root, 'src') + path.sep;
-const stub = (name) => ({ type: 'sourceFile', filePath: path.resolve(__dirname, 'stubs', name) });
+const stub = (name) => ({ type: 'sourceFile', filePath: path.resolve(__dirname, name) });
 const swap = (real, fake) => [path.resolve(root, real), fake];
 
 /** 앱 파일 → 가짜 파일 */
 const files = new Map([
-  swap('src/core/db.ts', 'db.ts'),
-  swap('src/core/history.ts', 'history.ts'),
-  swap('src/core/keys/vault.ts', 'vault.ts'),
-  swap('src/core/keys/mnemonic.ts', 'mnemonic.ts'),
-  swap('src/core/evm/provider.ts', 'provider.ts'),
-  swap('src/features/use-secret-screen.ts', 'use-secret-screen.ts'),
-  swap('src/features/format.ts', 'format.ts'),
-  swap('src/features/wallet/phrase-input.ts', 'phrase-input.tsx'),
-  swap('src/features/share.ts', 'share.ts'),
+  swap('src/platform/ui.ts', 'platform/ui.tsx'),
+  swap('src/core/db.ts', 'stubs/db.ts'),
+  swap('src/core/history.ts', 'stubs/history.ts'),
+  swap('src/core/keys/vault.ts', 'stubs/vault.ts'),
+  swap('src/core/keys/mnemonic.ts', 'stubs/mnemonic.ts'),
+  swap('src/core/evm/provider.ts', 'stubs/provider.ts'),
+  swap('src/features/format.ts', 'stubs/format.ts'),
+  swap('src/features/share.ts', 'stubs/share.ts'),
 ]);
 
 /** 앱 코드가 부르는 패키지 → 가짜 파일 */
-const packages = new Map([
-  ['expo-camera', 'camera.tsx'],
-  ['expo-clipboard', 'clipboard.ts'],
-  ['react-native-qrcode-svg', 'qrcode.tsx'],
-  ['react-native-safe-area-context', 'safe-area.ts'],
-]);
+const packages = new Map([['expo-clipboard', 'stubs/clipboard.ts']]);
 
 const entry = path.resolve(__dirname, 'entry.tsx');
 

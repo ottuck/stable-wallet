@@ -5,7 +5,7 @@ import { deriveAddress, generateMnemonic } from '@/core/keys/mnemonic';
 import { errorMessage } from '@/features/error-message';
 import { useT } from '@/features/i18n';
 import { Button, Card, Label, type Palette, Screen, useColors, useThemed } from '@/features/ui';
-import { useSecretScreen } from '@/features/use-secret-screen';
+import { useSecretScreen } from '@/platform/ui';
 import { useWallet } from '@/features/wallet/store';
 
 type Draft = { phrase: string; address: string; elapsedMs: number };
