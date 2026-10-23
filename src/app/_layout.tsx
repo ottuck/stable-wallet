@@ -49,16 +49,19 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={theme}>
       <StatusBar style="auto" />
-      {/* 제목은 iOS 기본(가운데, 17pt 굵게)과 같게 적어 웹에서도 같은 모양으로 보이게 한다 */}
+      {/* 제목은 iOS 기본(가운데, 17pt 굵게)과 같게 적어 웹에서도 같은 모양으로 보이게 한다.
+          뒤로 가기는 앞 화면 이름 없이 화살표만(웹과 같게) */}
       <Stack
         screenOptions={{
           headerShadowVisible: false,
           headerTitleAlign: 'center',
           headerTitleStyle: { fontSize: 17, fontWeight: '600' },
+          headerBackButtonDisplayMode: 'minimal',
         }}
       >
         <Stack.Protected guard={status === 'ready'}>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
+          {/* 제목은 다음 화면 뒤로 가기의 접근성 이름("홈, 뒤로")에 쓰인다 */}
+          <Stack.Screen name="index" options={{ headerShown: false, title: t.nav.home }} />
           <Stack.Screen name="send" options={withHomeBack(t.nav.send)} />
           <Stack.Screen name="send-review" options={withHomeBack(t.nav.review)} />
           <Stack.Screen
