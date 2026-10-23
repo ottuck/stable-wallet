@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import { Platform, Text, useColorScheme, useWindowDimensions, View } from 'react-native';
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import Svg, { Path, Rect } from 'react-native-svg';
 
 import { useColors } from '@/features/ui';
 
+import { FrameInsets } from './frame-insets';
 import { DemoLayer } from './overlay';
 
 const W = 390;
@@ -12,6 +12,8 @@ const H = 844;
 const BEZEL = 12;
 const STATUS = 47;
 const CAPTION = 40;
+/** 상태 표시줄은 틀이 직접 그리므로 위는 0, 아래는 iPhone 홈 인디케이터 자리 */
+const IPHONE_INSETS = { top: 0, bottom: 34, left: 0, right: 0 };
 
 /** 웹 데모 전용: 넓은 화면에서는 가운데에 iPhone 모양 틀을 놓고 앱을 그 안에 그린다. */
 export function PhoneFrame({ children }: PropsWithChildren) {
@@ -53,10 +55,10 @@ export function PhoneFrame({ children }: PropsWithChildren) {
             paddingTop: STATUS,
           }}
         >
-          {/* 웹에는 safe area가 없어 틀의 홈 인디케이터만큼 아래를 비운다 */}
-          <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 24, left: 0, right: 0 }}>
+          {/* 웹에는 safe area가 없어 앱 화면에 iPhone과 같은 값을 준다(demo/stubs/safe-area.ts) */}
+          <FrameInsets.Provider value={IPHONE_INSETS}>
             <DemoLayer>{children}</DemoLayer>
-          </SafeAreaInsetsContext.Provider>
+          </FrameInsets.Provider>
 
           <View
             pointerEvents="none"
@@ -112,7 +114,7 @@ export function PhoneFrame({ children }: PropsWithChildren) {
           fontSize: 12,
         }}
       >
-        Henry Wallet demo · fake data, no real assets / 가짜 데이터 · 실제 자산 아님
+        Henry Wallet demo · fake data, no real assets
       </Text>
     </View>
   );

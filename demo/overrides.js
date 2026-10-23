@@ -1,5 +1,5 @@
 // 데모 모드(STABLE_WALLET_DEMO=1)에서 Metro가 실제 파일 대신 demo/ 의 가짜 파일을 쓰게 한다.
-// 바꾸는 곳은 앱 바깥과 닿는 경계뿐이다: 저장소(SQLite), 키 보관(secure-store), RPC 연결, 웹에 없는 스크린샷 차단 API,
+// 바꾸는 곳은 앱 바깥과 닿는 경계뿐이다: 저장소(SQLite), 키 보관(secure-store), RPC 연결, 웹에 없는 스크린샷 차단 API·safe area,
 // 그리고 공개 웹 데모에서 막아야 하는 것(진짜 복구 문구 생성·입력, 카메라, 클립보드, 주소 QR·공유, 가짜 거래의 탐색기 링크).
 const path = require('path');
 
@@ -26,6 +26,7 @@ const packages = new Map([
   ['expo-camera', 'camera.tsx'],
   ['expo-clipboard', 'clipboard.ts'],
   ['react-native-qrcode-svg', 'qrcode.tsx'],
+  ['react-native-safe-area-context', 'safe-area.ts'],
 ]);
 
 const entry = path.resolve(__dirname, 'entry.tsx');
