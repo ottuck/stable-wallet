@@ -219,14 +219,14 @@ export default function SendInput() {
             </Label>
           </Pressable>
         </View>
-        {overBalance && (
-          <Label size={12} color={c.danger}>
+        {/* 한 줄 자리를 늘 둬 첫 숫자를 누를 때 아래 카드가 밀리지 않게 한다 */}
+        {overBalance ? (
+          <Label size={12} color={c.danger} style={{ lineHeight: 18 }}>
             {t.send.overBalance}
           </Label>
-        )}
-        {amount !== null && !overBalance && (
-          <Label mono muted size={12}>
-            {`raw ${amount.toString()} · decimals ${token.decimals}`}
+        ) : (
+          <Label mono muted size={12} style={{ lineHeight: 18 }}>
+            {`raw ${(amount ?? 0n).toString()} · decimals ${token.decimals}`}
           </Label>
         )}
       </Card>
