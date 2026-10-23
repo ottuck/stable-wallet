@@ -24,7 +24,7 @@ export const DEMO = {
   balances: { native: '0.42', USDC: '1284.56', JPYC: '48200' } as Record<string, string>,
 
   /** 이미 체인에 확정된 nonce 개수. 새 거래는 이 값부터 쓴다. */
-  startNonce: 5,
+  startNonce: 10,
 
   /** 수수료. gwei 단위 문자열 */
   fees: { baseGwei: '30', priorityGwei: '30', gasEstimate: 52_000n },
@@ -51,6 +51,35 @@ export const DEMO = {
       to: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
       status: 'failed' as const,
       daysAgo: 6,
+    },
+    // 홈에는 최근 5건만 보이므로 "전체 보기"가 나오도록 오래된 거래를 더 둔다
+    {
+      symbol: 'JPYC',
+      amount: '12000',
+      to: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
+      status: 'confirmed' as const,
+      daysAgo: 9,
+    },
+    {
+      symbol: 'USDC',
+      amount: '40',
+      to: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30',
+      status: 'confirmed' as const,
+      daysAgo: 14,
+    },
+    {
+      symbol: 'USDC',
+      amount: '250',
+      to: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      status: 'confirmed' as const,
+      daysAgo: 21,
+    },
+    {
+      symbol: 'JPYC',
+      amount: '5000',
+      to: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30',
+      status: 'confirmed' as const,
+      daysAgo: 30,
     },
   ],
 };
