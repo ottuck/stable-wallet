@@ -24,7 +24,6 @@ import {
   Button,
   Card,
   Label,
-  networkColor,
   Screen,
   TokenIcon,
   useColors,
@@ -235,7 +234,7 @@ function TokenRow({
   );
 }
 
-/** 잔액 카드 맨 아래 한 줄: 가스용 native 잔액과, 지금 수수료로 ERC-20 전송을 몇 번 할 수 있는지(50번을 가득으로 본다) */
+/** 잔액 카드 맨 아래 한 줄: 가스용 native 잔액과, 지금 수수료로 ERC-20 전송을 몇 번 할 수 있는지 */
 function GasLine({ balance, transferFee }: { balance: AssetBalance; transferFee: bigint | null }) {
   const c = useColors();
   const t = useT();
@@ -254,24 +253,15 @@ function GasLine({ balance, transferFee }: { balance: AssetBalance; transferFee:
         </Label>
       </View>
       {sends !== null && (
-        <View style={styles.gasLeft}>
-          {!short && (
-            <View style={styles.meter}>
-              <View
-                style={[
-                  styles.meterFill,
-                  {
-                    width: `${Math.min(sends / 50, 1) * 100}%`,
-                    backgroundColor: networkColor(balance.symbol),
-                  },
-                ]}
-              />
-            </View>
-          )}
-          <Label muted={!short} bold={short} size={12} color={short ? c.danger : undefined}>
-            {short ? t.home.gasShort : t.home.sendsLeft(sends > 999 ? '999+' : String(sends))}
-          </Label>
-        </View>
+        <Label
+          muted={!short}
+          bold={short}
+          size={12}
+          color={short ? c.danger : undefined}
+          style={{ flexShrink: 1, textAlign: 'right' }}
+        >
+          {short ? t.home.gasShort : t.home.sendsLeft(sends > 999 ? '999+' : String(sends))}
+        </Label>
       )}
     </View>
   );
@@ -356,7 +346,4 @@ const makeStyles = (c: Palette) =>
       borderTopColor: c.line,
     },
     gasName: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
-    gasLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
-    meter: { width: 36, height: 4, borderRadius: 2, backgroundColor: c.line },
-    meterFill: { height: 4, borderRadius: 2 },
   });

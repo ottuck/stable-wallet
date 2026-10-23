@@ -24,6 +24,8 @@ const light = {
   card: '#FFFFFF',
   soft: '#F7F8FA',
   segment: '#E9EBEF',
+  // 세그먼트(탭 묶음) 안에서 고른 칸
+  segmentOn: '#FFFFFF',
   text: '#0F1115',
   muted: '#5A606B',
   line: '#EEF0F2',
@@ -47,7 +49,8 @@ const dark: typeof light = {
   bg: '#0B0D12',
   card: '#151922',
   soft: '#1C212B',
-  segment: '#10131A',
+  segment: '#1A1F29',
+  segmentOn: '#2C3340',
   text: '#F2F4F7',
   muted: '#9AA1AD',
   line: '#222833',
