@@ -10,6 +10,13 @@ import { PhoneFrame } from './phone-frame';
 // 전시 화면에 개발용 경고 상자가 뜨지 않게 한다(개발 모드에서만 나오는 경고다)
 LogBox.ignoreAllLogs();
 
+// 웹 스크롤바를 숨긴다. 휴대폰처럼 보이게 하고, 스크롤바가 뒤늦게 생기며 화면 너비가 줄지 않게 한다
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = '*{scrollbar-width:none}*::-webkit-scrollbar{display:none}';
+  document.head.appendChild(style);
+}
+
 // expo-router/entry 대신 쓰는 데모 진입점. 앱 화면은 그대로 두고 폰 틀만 씌운다.
 function App() {
   return <ExpoRoot context={ctx} wrapper={PhoneFrame} />;
