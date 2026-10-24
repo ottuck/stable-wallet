@@ -30,7 +30,8 @@ export function DemoLayer({ children }: PropsWithChildren) {
           <Text style={{ fontWeight: '700', color: c.text }}>{d.bannerLead}</Text> {d.bannerBody}
         </Text>
       </View>
-      <View style={{ flex: 1 }}>{children}</View>
+      {/* 화면 조각(route chunk)을 받는 동안에도 흰 바탕이 비치지 않게 앱 바탕색을 깐다 */}
+      <View style={{ flex: 1, backgroundColor: c.bg }}>{children}</View>
       <FaceIdScene />
       <Toast />
     </View>

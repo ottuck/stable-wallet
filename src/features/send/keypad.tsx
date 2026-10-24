@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import type { AmountKey } from '@/core/amount';
 import { useT } from '@/features/i18n';
@@ -11,6 +11,13 @@ const ROWS: AmountKey[][] = [
   ['7', '8', '9'],
   ['.', '0', 'back'],
 ];
+
+/** 이보다 낮은 화면(모바일 웹처럼 주소창·툴바가 높이를 먹는 경우)에서는 키패드와 금액 카드를 줄인다 */
+const SHORT_SCREEN = 760;
+
+export function useShortScreen() {
+  return useWindowDimensions().height < SHORT_SCREEN;
+}
 
 /** 금액 전용 숫자 키패드. 키를 누르면 onKey, 지우기를 길게 누르면 onClear. 문자열 규칙은 core/amount가 정한다. */
 export function Keypad({
@@ -26,10 +33,11 @@ export function Keypad({
   const c = useColors();
   const t = useT();
   const styles = useThemed(makeStyles);
+  const short = useShortScreen();
   return (
-    <View style={styles.pad}>
+    <View style={[styles.pad, short && styles.tight]}>
       {ROWS.map((row) => (
-        <View key={row.join('')} style={styles.row}>
+        <View key={row.join('')} style={[styles.row, short && styles.tight]}>
           {row.map((key) => {
             const unused = key === '.' && decimals === 0;
             return (
@@ -43,7 +51,11 @@ export function Keypad({
                 disabled={unused}
                 onPress={() => onKey(key)}
                 onLongPress={key === 'back' ? onClear : undefined}
-                style={({ pressed }) => [styles.key, pressed && styles.pressed]}
+                style={({ pressed }) => [
+                  styles.key,
+                  short && styles.keyShort,
+                  pressed && styles.pressed,
+                ]}
               >
                 {key === 'back' ? (
                   <BackspaceIcon size={24} color={c.text} />
@@ -65,6 +77,7 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     pad: { gap: 6 },
     row: { flexDirection: 'row', gap: 6 },
+    tight: { gap: 4 },
     key: {
       flex: 1,
       height: 46,
@@ -73,6 +86,7 @@ const makeStyles = (c: Palette) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
+    keyShort: { height: 36 },
     pressed: { backgroundColor: c.accentSoft },
     digit: { fontFamily: fonts.mono, fontSize: 22, fontWeight: undefined },
   });
