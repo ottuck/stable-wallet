@@ -5,7 +5,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 
 import { HomeBack } from '@/features/home-back';
 import { useT } from '@/features/i18n';
@@ -33,8 +33,9 @@ export default function RootLayout() {
   };
   const status = useWallet((s) => s.status);
   const [fontsLoaded, fontError] = useFonts({ IBMPlexMono_500Medium, IBMPlexMono_600SemiBold });
-  // 글꼴을 못 읽어도 시스템 글꼴로 연다(스플래시에 갇히지 않게)
-  const ready = status !== 'loading' && (fontsLoaded || fontError != null);
+  // 글꼴을 못 읽어도 시스템 글꼴로 연다(스플래시에 갇히지 않게). 웹은 스플래시가 없어 글꼴을 기다리는 동안
+  // 빈 화면만 보이므로(첫 방문 모바일 회선에서 수 초), 기다리지 않고 열면 글꼴이 오는 대로 바뀐다
+  const ready = status !== 'loading' && (Platform.OS === 'web' || fontsLoaded || fontError != null);
 
   useEffect(() => {
     void useWallet.getState().init();
