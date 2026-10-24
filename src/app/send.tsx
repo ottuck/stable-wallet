@@ -12,7 +12,7 @@ import { useT } from '@/features/i18n';
 import { useBalances } from '@/features/home/use-balances';
 import { AlertIcon, CheckIcon, ScanIcon } from '@/features/icons';
 import { useNetwork } from '@/features/network-store';
-import { Keypad } from '@/features/send/keypad';
+import { Keypad, useShortScreen } from '@/features/send/keypad';
 import { useSendFlow } from '@/features/send/store';
 import {
   Button,
@@ -37,14 +37,16 @@ function tryParse<T>(fn: () => T): T | null {
 }
 
 /** 금액 글자는 길어지면 단계적으로 줄여 한 줄에 둔다 */
-function amountFontSize(length: number) {
-  return length > 13 ? 22 : length > 10 ? 28 : length > 8 ? 34 : 44;
+function amountFontSize(length: number, short: boolean) {
+  const size = length > 13 ? 22 : length > 10 ? 28 : length > 8 ? 34 : 44;
+  return short ? Math.min(size, 36) : size;
 }
 
 export default function SendInput() {
   const c = useColors();
   const t = useT();
   const styles = useThemed(makeStyles);
+  const short = useShortScreen();
   const address = useWallet((s) => s.address)!;
   const network = useNetwork((s) => s.network);
   const tokens = tokensOn(network.id);
@@ -166,7 +168,11 @@ export default function SendInput() {
                 // 토큰마다 소수 자릿수가 달라 입력해 둔 금액을 그대로 쓸 수 없다
                 setAmountText('');
               }}
-              style={[styles.segmentItem, i === tokenIndex && styles.segmentSelected]}
+              style={[
+                styles.segmentItem,
+                short && { height: 38 },
+                i === tokenIndex && styles.segmentSelected,
+              ]}
             >
               <TokenIcon symbol={x.symbol} size={20} />
               <Label bold size={14} color={i === tokenIndex ? c.text : c.muted}>
@@ -178,7 +184,13 @@ export default function SendInput() {
       )}
 
       <Card
-        style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 16, flex: 1 }}
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingVertical: short ? 6 : 16,
+          gap: short ? 4 : 10,
+          flex: 1,
+        }}
       >
         <View style={styles.amountRow}>
           <TokenIcon symbol={token.symbol} size={28} />
@@ -193,7 +205,7 @@ export default function SendInput() {
             adjustsFontSizeToFit
             minimumFontScale={0.5}
             color={overBalance ? c.danger : amountText === '' ? c.placeholder : c.text}
-            style={{ fontSize: amountFontSize(amountShown.length), flexShrink: 1 }}
+            style={{ fontSize: amountFontSize(amountShown.length, short), flexShrink: 1 }}
           >
             {amountShown}
           </Label>
