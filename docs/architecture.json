@@ -1,0 +1,23 @@
+{
+  "title": "Henry Wallet",
+  "width": 1120,
+  "height": 420,
+  "summary": "You use the screens on your phone. The screens call the wallet logic, which signs through the key vault and reaches the keychain, the database and the network only through one device layer. The network is a public RPC node.",
+  "groups": [{ "title": "Your phone", "x": 240, "y": 40, "w": 560, "h": 350 }],
+  "nodes": [
+    { "id": "you", "x": 110, "y": 130, "title": "You", "tone": "accent" },
+    { "id": "screens", "x": 370, "y": 130, "title": "Screens", "note": "Expo Router · React" },
+    { "id": "core", "x": 650, "y": 130, "title": "Wallet logic", "note": "transfer · history · EVM" },
+    { "id": "vault", "x": 370, "y": 310, "title": "Key vault", "note": "phrase · local signing" },
+    { "id": "device", "x": 650, "y": 310, "title": "Device layer", "note": "Keychain · SQLite · camera" },
+    { "id": "rpc", "x": 960, "y": 310, "title": "Public RPC node", "note": "Polygon · Ethereum · Avalanche", "tone": "outside" }
+  ],
+  "edges": [
+    { "from": "you", "to": "screens", "label": "Face ID" },
+    { "from": "screens", "to": "core" },
+    { "from": "core", "to": "vault", "label": "Sign", "route": "vhv", "bend": 220, "fromOffset": -40 },
+    { "from": "core", "to": "device", "both": true },
+    { "from": "vault", "to": "device", "both": true },
+    { "from": "device", "to": "rpc", "label": "RPC", "both": true }
+  ]
+}

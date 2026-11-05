@@ -51,27 +51,12 @@ There is no Henry Wallet service behind the app. Nobody can see your balance, fr
 
 ## How it fits together
 
-Everything you do stays on your phone. The only thing that reaches the outside world is the finished, signed payment.
+Everything you do stays on your phone. Only balance lookups and the finished, signed payment go out to the network.
 
-```mermaid
-flowchart LR
-  you(["👤 You"])
-
-  subgraph phone["📱 Your phone"]
-    app["<b>Henry Wallet</b><br/>Balance · Send · Receive · Scan"]
-    vault[("🔐 Secure vault<br/>recovery phrase<br/>opened with Face ID")]
-    history[("🗂 Payment history")]
-  end
-
-  subgraph chain["🌐 Public blockchains"]
-    net["Polygon · Ethereum · Avalanche<br/>USDC · JPYC"]
-  end
-
-  you -- "Face ID" --> app
-  app <--> vault
-  app --> history
-  app <-- "balances · signed payments" --> net
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.svg" />
+  <img src="docs/architecture.svg" alt="Architecture: you use the screens on your phone; the screens call the wallet logic, which signs through the key vault and reaches the keychain, database and network only through one device layer." />
+</picture>
 
 ## Sending a payment
 
