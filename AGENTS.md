@@ -34,7 +34,7 @@ pnpm dlx expo-doctor       # 의존성·설정 진단
 
 - `src/app/` 화면(Expo Router) · `src/features/` 화면별 UI·hook · `src/core/` React를 모르는 지갑 로직.
 - 지갑 로직(거래 순서·저장·검증)은 화면에 두지 않고 `core`에 둔다. 서버가 없어도 서비스(core)와 화면을 나눈다. 거래 흐름은 `core/transfer.ts`(서명 → 전송 전 pending 저장 → 전송 → 확인)에만 있고 화면은 부르기만 한다.
-- `src/platform/`은 앱이 기기·바깥과 닿는 유일한 경계다: `services.ts`(보안 저장소·난수·RPC·저장소·클립보드·공유·링크, React 없음)와 `ui.ts`(카메라·QR·복구 문구 입력란·화면 캡처 차단·safe area). 기기 패키지(expo-secure-store·sqlite·camera·clipboard·screen-capture, qrcode, safe-area), `react-native`의 `Share`·`Linking`, `ethers`의 `randomBytes`는 여기서만 import한다(lint 에러). 새 기기 기능도 여기에 더한다.
+- `src/platform/`은 앱이 기기·바깥과 닿는 유일한 경계다: `services.ts`(보안 저장소·난수·RPC·저장소·클립보드·공유·링크, React 없음)와 `ui.ts`(카메라·QR·복구 문구 입력란·앱 전환기 가림·safe area). 기기 패키지(expo-secure-store·sqlite·camera·clipboard·screen-capture, qrcode, safe-area), `react-native`의 `Share`·`Linking`, `ethers`의 `randomBytes`는 여기서만 import한다(lint 에러). 새 기기 기능도 여기에 더한다.
 - `core`는 `app`/`features`/React(`platform/ui` 포함)를 import하지 않는다. 보안 저장소(`platform/services`의 `secureStore`)는 `core/keys`만 쓴다(lint 에러).
 - 경로 별칭 `@/` = `src/`.
 - 화면 문구는 `src/features/i18n/messages.ts`에만 둔다(한국어 `ko`가 기준, 영어 `en`은 같은 모양). 컴포넌트에 문구를 직접 쓰지 않고 `useT()`로 읽는다. 문구를 더하면 두 언어를 같이 더한다.

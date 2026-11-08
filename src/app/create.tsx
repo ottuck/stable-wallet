@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { deriveAddress, generateMnemonic } from '@/core/keys/mnemonic';
@@ -42,9 +42,7 @@ export default function Create() {
   const c = useColors();
   const t = useT();
   const styles = useThemed(makeStyles);
-  const [draft, setDraft] = useState(createDraft);
-  // 저장 중에 찍힌 스크린샷도 알 수 있게 지금 보이는 문구를 ref로 따라간다
-  const currentDraft = useRef(draft);
+  const [draft] = useState(createDraft);
   const [step, setStep] = useState<'write' | 'verify'>('write');
   // 문구를 다시 보러 갔다 오면 질문 위치를 새로 뽑는다(한 번 외운 답을 재사용하지 못하게)
   const [round, setRound] = useState(0);
@@ -54,28 +52,16 @@ export default function Create() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 스크린샷에 찍힌 문구는 쓰지 않는다
-  useSecretScreen(() => {
-    const next = createDraft();
-    currentDraft.current = next;
-    setDraft(next);
-    setPicked({});
-    setStep('write');
-    setError(t.create.screenshotRegenerated);
-  });
+  useSecretScreen();
 
   const answered = quiz.every((q) => picked[q.position] !== undefined);
   const correct = quiz.every((q) => picked[q.position] === q.answer);
 
   async function confirm() {
-    const saving = draft;
     setBusy(true);
     setError(null);
     try {
-      const saved = await useWallet
-        .getState()
-        .save(saving.phrase, () => currentDraft.current === saving);
-      if (!saved) setBusy(false);
+      await useWallet.getState().save(draft.phrase);
     } catch (e) {
       setError(errorMessage(e));
       setBusy(false);
