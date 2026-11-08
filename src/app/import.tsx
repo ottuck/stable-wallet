@@ -15,7 +15,7 @@ export default function Import() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useSecretScreen(() => setError(t.import.screenshot));
+  useSecretScreen();
 
   async function submit() {
     setBusy(true);

@@ -30,7 +30,7 @@
 - private key는 저장하지 않는다. 서명할 때 mnemonic에서 파생해 쓰고 참조를 버린다.
 - 주소(공개 정보)는 인증 없이 따로 둔다. 잔액 조회와 재설치 때 지갑 확인에 Face ID가 필요 없다.
 - secret 금지 위치: AsyncStorage, SQLite, `.env`, Git, 로그(`console.*`), 에러 메시지, 클립보드.
-- 복구 문구 화면은 스크린샷·화면 녹화를 막고(expo-screen-capture) 복사 버튼을 두지 않는다. 새 지갑은 문구를 보여준 뒤 무작위 세 자리의 단어를 4지선다로 확인하고, 문구를 다시 보러 갔다 오면 질문 위치를 새로 뽑는다.
+- 복구 문구 화면은 스크린샷·화면 녹화를 막지 않는다(사용자가 보관할 수 있다). 대신 사진 앱·iCloud에 남는다는 경고를 보여 주고, 앱 전환기 미리보기는 흐리게 하며(expo-screen-capture), 복사 버튼을 두지 않는다. 새 지갑은 문구를 보여준 뒤 무작위 세 자리의 단어를 4지선다로 확인하고, 문구를 다시 보러 갔다 오면 질문 위치를 새로 뽑는다.
 - 암호 primitive(BIP-39, secp256k1, keccak, 키 파생)는 직접 구현하지 않고 ethers를 쓴다.
 - 의존성은 정확한 버전으로 고정하고 lockfile을 커밋한다. 서명·키 경로에는 새 패키지를 들이지 않는다.
 - 백업은 복구 문구(종이)뿐이다. Face ID 등록 정보가 바뀌어 iOS가 항목을 무효화하면 mnemonic으로 복원한다.
@@ -47,7 +47,7 @@
 src/
 ├── app/            # 화면(Expo Router). 로직은 features/core를 부른다
 ├── features/       # 화면 단위 UI·hook
-├── platform/       # 기기·바깥과 닿는 유일한 경계: services.ts(보안 저장소·난수·RPC·저장소·클립보드·공유·링크), ui.ts(카메라·QR·문구 입력란·캡처 차단·safe area), store.ts(SQLite)
+├── platform/       # 기기·바깥과 닿는 유일한 경계: services.ts(보안 저장소·난수·RPC·저장소·클립보드·공유·링크), ui.ts(카메라·QR·문구 입력란·앱 전환기 가림·safe area), store.ts(SQLite)
 └── core/           # React를 모르는 지갑 로직
     ├── config/     # networks.ts, tokens.ts
     ├── keys/       # mnemonic 생성·검증·파생, 보안 저장소 접근 (mnemonic을 만지는 유일한 곳)

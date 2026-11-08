@@ -25,7 +25,7 @@ export const useSafeAreaInsets: typeof Real.useSafeAreaInsets = () => {
   return frame ?? real;
 };
 
-/** 웹에는 스크린샷 차단 API가 없다 */
+/** 웹에는 앱 전환기 미리보기가 없다 */
 export const useSecretScreen: typeof Real.useSecretScreen = () => {};
 
 /**

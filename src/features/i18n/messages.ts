@@ -38,13 +38,11 @@ export const ko = {
     import: '복구 문구로 가져오기',
   },
   create: {
-    screenshotRegenerated:
-      '스크린샷이 감지되어 복구 문구를 새로 만들었습니다. 사진 앱의 스크린샷도 지워 주세요.',
     written: '적어 두었습니다',
     writeIntro:
       '아래 12단어를 순서대로 종이에 적어 두세요. 이 문구가 지갑 그 자체입니다. 앱을 지우거나 기기를 잃어도 이 문구로만 되찾을 수 있습니다.',
     captureNote:
-      '스크린샷·화면 녹화는 막혀 있고, 찍히면 문구를 새로 만듭니다. 문구를 묻는 사람이나 사이트는 모두 사기입니다.',
+      '스크린샷으로 보관하면 사진 앱과 iCloud에도 남아, 기기나 계정이 뚫릴 때 지갑을 잃을 수 있습니다. 찍어 둔다면 안전한 곳에만 두세요. 문구를 묻는 사람이나 사이트는 모두 사기입니다.',
     derived: (ms: number) => `생성·파생 ${ms}ms`,
     wrongWords: '맞지 않는 단어가 있습니다. 적어 둔 문구를 다시 확인해 주세요.',
     createWallet: '지갑 만들기',
@@ -61,7 +59,6 @@ export const ko = {
     confirmBody: '복구 문구를 적어 두지 않았다면 이 지갑의 자산을 잃습니다.',
   },
   import: {
-    screenshot: '스크린샷이 감지되었습니다. 복구 문구가 찍혔다면 사진 앱에서 지워 주세요.',
     intro: '복구 문구 12단어를 띄어쓰기로 구분해 입력하세요.',
     field: '복구 문구',
     note: '이 문구는 이 기기 밖으로 나가지 않습니다. 앱이나 사이트가 문구를 요구하면 사기입니다.',
@@ -242,13 +239,11 @@ export const en: Messages = {
     import: 'Import with a recovery phrase',
   },
   create: {
-    screenshotRegenerated:
-      'We detected a screenshot, so we generated a new recovery phrase. Please delete the screenshot from your Photos too.',
     written: 'I’ve written it down',
     writeIntro:
       'Write these 12 words on paper, in order. This phrase is your wallet: if you delete the app or lose your phone, it is the only way to recover your funds.',
     captureNote:
-      'Screenshots and screen recording are blocked. If one is captured, we generate a new phrase. Anyone who asks for your phrase is a scammer.',
+      'A screenshot is also kept in Photos and iCloud, so if your phone or account is breached you could lose your wallet. If you keep one, store it somewhere safe. Anyone who asks for your phrase is a scammer.',
     derived: (ms: number) => `Generated in ${ms} ms`,
     wrongWords: 'Some words don’t match. Check the phrase you wrote down and try again.',
     createWallet: 'Create wallet',
@@ -265,8 +260,6 @@ export const en: Messages = {
     confirmBody: 'Unless you saved the recovery phrase, you will lose any funds in this wallet.',
   },
   import: {
-    screenshot:
-      'We detected a screenshot. If it captured your recovery phrase, delete it from your Photos.',
     intro: 'Enter your 12-word recovery phrase, separated by spaces.',
     field: 'Recovery phrase',
     note: 'Your phrase never leaves this device. If any app or website asks for it, it’s a scam.',
