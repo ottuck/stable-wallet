@@ -156,7 +156,7 @@ export default function SendInput() {
         {network.name}
       </Label>
 
-      {tokens.length > 1 && (
+      {tokens.length > 1 && !focused && (
         <View style={styles.segment}>
           {tokens.map((x, i) => (
             <Pressable
@@ -189,7 +189,8 @@ export default function SendInput() {
           justifyContent: 'center',
           paddingVertical: short ? 6 : 16,
           gap: short ? 4 : 10,
-          flex: 1,
+          // 주소를 직접 입력하는 동안에는 키보드 위 좁은 자리에 받는 주소 칸이 보이게 금액 카드를 줄인다
+          flex: focused ? 0 : 1,
         }}
       >
         <View style={styles.amountRow}>
@@ -213,33 +214,39 @@ export default function SendInput() {
             {token.symbol}
           </Label>
         </View>
-        <View style={styles.balanceRow}>
-          <Label muted size={12}>
-            {t.send.balance}{' '}
-            <Label mono muted size={12}>
-              {balance === null ? '…' : formatAmount(balance, token.decimals)}
-            </Label>
-          </Label>
-          <Pressable
-            accessibilityRole="button"
-            disabled={balance === null}
-            onPress={() => balance !== null && setAmountText(formatAmount(balance, token.decimals))}
-            hitSlop={12}
-          >
-            <Label bold size={13} color={c.accent}>
-              {t.send.max}
-            </Label>
-          </Pressable>
-        </View>
-        {/* 한 줄 자리를 늘 둬 첫 숫자를 누를 때 아래 카드가 밀리지 않게 한다 */}
-        {overBalance ? (
-          <Label size={12} color={c.danger} style={{ lineHeight: 18 }}>
-            {t.send.overBalance}
-          </Label>
-        ) : (
-          <Label mono muted size={12} style={{ lineHeight: 18 }}>
-            {`raw ${(amount ?? 0n).toString()} · decimals ${token.decimals}`}
-          </Label>
+        {!focused && (
+          <>
+            <View style={styles.balanceRow}>
+              <Label muted size={12}>
+                {t.send.balance}{' '}
+                <Label mono muted size={12}>
+                  {balance === null ? '…' : formatAmount(balance, token.decimals)}
+                </Label>
+              </Label>
+              <Pressable
+                accessibilityRole="button"
+                disabled={balance === null}
+                onPress={() =>
+                  balance !== null && setAmountText(formatAmount(balance, token.decimals))
+                }
+                hitSlop={12}
+              >
+                <Label bold size={13} color={c.accent}>
+                  {t.send.max}
+                </Label>
+              </Pressable>
+            </View>
+            {/* 한 줄 자리를 늘 둬 첫 숫자를 누를 때 아래 카드가 밀리지 않게 한다 */}
+            {overBalance ? (
+              <Label size={12} color={c.danger} style={{ lineHeight: 18 }}>
+                {t.send.overBalance}
+              </Label>
+            ) : (
+              <Label mono muted size={12} style={{ lineHeight: 18 }}>
+                {`raw ${(amount ?? 0n).toString()} · decimals ${token.decimals}`}
+              </Label>
+            )}
+          </>
         )}
       </Card>
 
@@ -298,6 +305,8 @@ export default function SendInput() {
             autoCapitalize="none"
             autoCorrect={false}
             spellCheck={false}
+            // 주소는 영문·숫자뿐이라 기기 키보드가 한글이어도 영문 자판으로 연다(iOS)
+            keyboardType="ascii-capable"
             autoFocus
             multiline
             returnKeyType="done"
