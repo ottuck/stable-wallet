@@ -4,22 +4,20 @@
 
 ## Phase 1 — 테스트넷 지갑 (Polygon Amoy, Sepolia)
 
-Amoy POL·USDC, 테스트넷 JPYC(JPYC Faucet), Sepolia ETH를 faucet에서 먼저 받는다.
+Sepolia ETH는 Sepolia를 확인할 때 faucet에서 받는다.
 
 ### 키와 서명
 
 - [ ] 같은 mnemonic을 MetaMask(테스트 지갑)에 import → 같은 주소
 - [ ] 복구 문구 화면 스크린샷 차단(iOS에서 찍히면 감지 시 문구 재생성으로 보완, 차단 여부 재확인)
-- [ ] 테스트 USDC `balanceOf`
-- [ ] transfer 생성 → Face ID → 로컬 서명 → 전송 → receipt confirmed
 - [ ] 앱을 닫았다 열어도 pending 거래가 확정으로 바뀐다
-- [ ] 가스·잔액 부족, 잘못된 주소, RPC 끊김에서 서명 전에 막힌다
+- [ ] 가스 부족, RPC 끊김에서 서명 전에 막힌다
 
 ### 화면 (iPhone)
 
 - [ ] Create(복구 문구 표시, 스크린샷 차단, 단어 확인) / Import
 - [ ] 재설치: 앱 삭제 → 재설치 → "기존 지갑 계속 쓰기" 또는 Import로 복원
-- [ ] Balance(native + USDC + JPYC), Send(검증·확인 화면·에러 문구), Receive(주소·복사·QR·네트워크 경고)
+- [ ] Receive(주소·복사·QR·네트워크 경고)
 - [ ] 보내기 입력: 숫자 키패드(소수점·지우기·길게 눌러 비우기·최대), 붙여넣기·QR, "직접 입력" 때 키보드·키패드 전환, 작은 기기·큰 글씨·한국어/영어에서 한 화면에 들어가는지
 - [ ] QR 스캔 → 수신자 입력(카메라 권한 요청, 거부 뒤 설정 안내 화면 포함)
 - [ ] History: pending → confirmed/failed/dropped, 재시작 후 이어서 확인, 홈 최근 5건 → "전체 보기"
@@ -29,10 +27,6 @@ Amoy POL·USDC, 테스트넷 JPYC(JPYC Faucet), Sepolia ETH를 faucet에서 먼�
 - [ ] 개발용 빌드를 다시 만든 뒤 앱 이름·아이콘·스플래시, 다크 모드
 - [ ] 헨리 코인: 전송 완료 때 뒤집히며 나타나는지(동작 줄이기에서는 바로 보이는지), 보낸 거래가 없는 빈 상태
 - [ ] `src/platform` 경계 뒤 회귀: 기존 지갑이 열리고, Face ID 서명, 거래 기록·언어 유지, 붙여넣기·복사·공유·카메라 권한 설정 이동
-
-### 완료 확인
-
-- [ ] MetaMask → 앱 수신, 앱 → MetaMask 송금, explorer에서 확인
 
 ## Phase 2 — Polygon 메인넷 소액
 
